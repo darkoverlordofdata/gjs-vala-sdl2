@@ -54,6 +54,8 @@ namespace sdx
         def addSprite(sprite:Object)
             sprites.add((Sprite)sprite)
 
+        def removeSprite(sprite:Object)
+            sprites.remove((Sprite)sprite)
 
         def setApplicationListener(listener: ApplicationListener)
             app = listener
@@ -148,6 +150,6 @@ namespace sdx
                 fps = (int)((double)frames / elapsed)
                 elapsed = 0.0
                 frames = 0
-                // print("fps %i", fps)
+                //print("fps %i", fps)
 
 
