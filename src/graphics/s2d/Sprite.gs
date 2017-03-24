@@ -35,6 +35,10 @@ namespace sdx.graphics.s2d
         prop y : int
         scale : Scale = Scale() { x = 1.0, y = 1.0 }
         //color : Color = Color() { r = 255, g = 255, b = 255, a = 255 }
+        prop r: int = 255
+        prop g: int = 255
+        prop b: int = 255
+        prop a: int = 255
         prop centered : bool = true
         prop layer : int = 0
         id : int = ++uniqueId
@@ -109,6 +113,11 @@ namespace sdx.graphics.s2d
             scale.x = x
             scale.y = y
 
+        def setColor(r:int, g:int, b:int)
+            _r = r
+            _g = g
+            _b = b
+
         /**
          *  Change the text value of a Sprite.fromRenderedText
          *
@@ -146,6 +155,7 @@ namespace sdx.graphics.s2d
 
             /* apply current tint */
             //texture.set_color_mod(color.r, color.g, color.b)
+            texture.set_color_mod((uint8)_r, (uint8)_g, (uint8)_b)
             /* copy to the rendering context */
             renderer.copy(texture, null, {x, y, w, h})
 

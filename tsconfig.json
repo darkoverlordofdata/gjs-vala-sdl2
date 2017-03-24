@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "amd",
+    "rootDir": "src/js",
+    "allowJs": true,
+    "allowUnreachableCode": true,
+    "allowUnusedLabels": true,
+    "outFile": "bin/game"
+  },
+  "files": [
+    "src/js/gjs.d.ts",
+    "src/js/gjs.js",
+    "src/js/global.js",
+    "src/js/game.js"
+  ]
+}

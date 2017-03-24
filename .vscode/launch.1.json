@@ -6,8 +6,8 @@
             "type": "lldb",
             "request": "launch",
             "cwd": "${workspaceRoot}",
-            "program": "/bin/sh",
-            "args": ["./run.sh"]
+            "program": "/usr/bin/gjs",
+            "args": ["bin/game"]
         }
     ]
 }

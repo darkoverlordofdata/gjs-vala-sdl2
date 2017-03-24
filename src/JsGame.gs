@@ -52,7 +52,19 @@ namespace sdx
             initialize()
 
         def addSprite(sprite:Object)
-            sprites.add((Sprite)sprite)
+            var ordinal = ((Sprite)sprite).layer
+            if sprites.size == 0
+                sprites.add((Sprite)sprite)
+            else
+                var i = 0
+                for s in sprites
+                    if ordinal <= s.layer
+                        sprites.insert(i, (Sprite)sprite)
+                        return
+                    else
+                        i++
+                sprites.add((Sprite)sprite)
+
 
         def removeSprite(sprite:Object)
             sprites.remove((Sprite)sprite)
@@ -93,14 +105,17 @@ namespace sdx
                 "SDL_mixer unable to initialize!")
 
             keys = new array of uint8[255]
+            print "Game Initialized "
+
+        def start()
             running = true
             lastTime = (double)GLib.get_real_time()/1000000.0        
-            print "Game Initialized "
                 
         def getKey(i:int):int
             return keys[i]
 
         def handleEvents():int
+
             while Event.poll(out evt) != 0
                 case evt.type // patch for keyboardGetState
                     when SDL.EventType.KEYDOWN
@@ -108,15 +123,19 @@ namespace sdx
                     when SDL.EventType.KEYUP
                         keys[evt.key.keysym.sym] = 0
                     when  SDL.EventType.MOUSEMOTION
-                        mouse_x = (int)evt.motion.x
-                        mouse_y = (int)evt.motion.y
+                        _mouse_x = (int)evt.motion.x
+                        _mouse_y = (int)evt.motion.y
                     when  SDL.EventType.MOUSEBUTTONDOWN
-                        mouse_down = true
+                        _mouse_down = true
                     when  SDL.EventType.MOUSEBUTTONUP
-                        mouse_down = false
+                        _mouse_down = false
                     when SDL.EventType.QUIT
-                        running = false
+                        _running = false
 
+            Sdx.graphics.updateTime()
+            _delta_time = Sdx.graphics.deltaTime
+            if (_delta_time > 1) do _delta_time = 1.0/60.0
+            _fps = Sdx.graphics.fps
             return evt.type
 
         def draw()
@@ -134,22 +153,6 @@ namespace sdx
             onetime = new list of Sprite           
             if YieldForEventsMS > 0 do GLib.Thread.usleep(YieldForEventsMS) 
             renderer.present()
-            profile()
 
-
-
-        def profile()
-            lastTime = currentTime
-            currentTime = (double)GLib.get_real_time()/1000000.0
-            delta_time = (currentTime - lastTime)
-            // print("%f", delta_time)
-            frames++
-            elapsed = elapsed + delta_time
-
-            if elapsed > 1.0
-                fps = (int)((double)frames / elapsed)
-                elapsed = 0.0
-                frames = 0
-                //print("fps %i", fps)
 
 

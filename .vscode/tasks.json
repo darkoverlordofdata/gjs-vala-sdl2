@@ -9,7 +9,7 @@
     "suppressTaskName": true,
     "tasks": [
         {
-            "isBuildCommand",
+            "isBuildCommand": true,
             "taskName": "build",
             "args": ["./build.sh"]
         }
