@@ -1,3 +1,6 @@
+/**
+ * Entity Factory
+ */
 import * as sdx from 'Sdx'
 
 const Tau = 6.28318
@@ -133,7 +136,7 @@ export const all = new Array(27)
 export const bullets = new Array(20)
 export const enemies = new Array(18)
 export const explosions = new Array(8)
-export const bang = new Array(8)
+export const bangs = new Array(8)
 
 export function createAll(game) {
     let z = 0 // entity 
@@ -199,14 +202,14 @@ export function createAll(game) {
     all[z++] = explosions[x++] = createExplosion()
     all[z++] = explosions[x++] = createExplosion()
 
-    all[z++] = explosions[g++] = createBang()
-    all[z++] = explosions[g++] = createBang()
-    all[z++] = explosions[g++] = createBang()
-    all[z++] = explosions[g++] = createBang()
-    all[z++] = explosions[g++] = createBang()
-    all[z++] = explosions[g++] = createBang()
-    all[z++] = explosions[g++] = createBang()
-    all[z++] = explosions[g++] = createBang()
+    all[z++] = bangs[g++] = createBang()
+    all[z++] = bangs[g++] = createBang()
+    all[z++] = bangs[g++] = createBang()
+    all[z++] = bangs[g++] = createBang()
+    all[z++] = bangs[g++] = createBang()
+    all[z++] = bangs[g++] = createBang()
+    all[z++] = bangs[g++] = createBang()
+    all[z++] = bangs[g++] = createBang()
 
     const player = all[z++] = createPlayer()
     game.addSprite(all[0].sprite)

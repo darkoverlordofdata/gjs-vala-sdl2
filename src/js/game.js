@@ -20,13 +20,14 @@ function main() {
         game.handleEvents()
         if (game.getKey(keys.KEY_ESC)) break
         else {
-            systems.physicsSystem(game, entities.all)
-            systems.removalSystem(game, entities.all)
             systems.spawnSystem(game, entities.enemies)
-            systems.expireSystem(game, entities.all)
-            //systems.tweenSystem(game, entities.explosions)
-            //systems.tweenSystem(game, entities.bang)
+            systems.collisionSystem(game, entities.enemies, entities.bullets, entities.bangs, entities.explosions)
+            systems.tweenSystem(game, entities.bangs)
+            systems.tweenSystem(game, entities.explosions)
             systems.inputSystem(game, player, entities.bullets)
+            systems.expireSystem(game, entities.all)
+            systems.removalSystem(game, entities.all)
+            systems.physicsSystem(game, entities.all)
             game.draw()
         }
     }

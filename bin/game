@@ -179,7 +179,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
     exports.bullets = new Array(20);
     exports.enemies = new Array(18);
     exports.explosions = new Array(8);
-    exports.bang = new Array(8);
+    exports.bangs = new Array(8);
     function createAll(game) {
         var z = 0; // entity 
         var b = 0; // bullets
@@ -238,14 +238,14 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         exports.all[z++] = exports.explosions[x++] = createExplosion();
         exports.all[z++] = exports.explosions[x++] = createExplosion();
         exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.explosions[g++] = createBang();
-        exports.all[z++] = exports.explosions[g++] = createBang();
-        exports.all[z++] = exports.explosions[g++] = createBang();
-        exports.all[z++] = exports.explosions[g++] = createBang();
-        exports.all[z++] = exports.explosions[g++] = createBang();
-        exports.all[z++] = exports.explosions[g++] = createBang();
-        exports.all[z++] = exports.explosions[g++] = createBang();
-        exports.all[z++] = exports.explosions[g++] = createBang();
+        exports.all[z++] = exports.bangs[g++] = createBang();
+        exports.all[z++] = exports.bangs[g++] = createBang();
+        exports.all[z++] = exports.bangs[g++] = createBang();
+        exports.all[z++] = exports.bangs[g++] = createBang();
+        exports.all[z++] = exports.bangs[g++] = createBang();
+        exports.all[z++] = exports.bangs[g++] = createBang();
+        exports.all[z++] = exports.bangs[g++] = createBang();
+        exports.all[z++] = exports.bangs[g++] = createBang();
         var player = exports.all[z++] = createPlayer();
         game.addSprite(exports.all[0].sprite);
         game.addSprite(player.sprite);
@@ -264,10 +264,16 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
         for (var _i = 0, entities_1 = entities; _i < entities_1.length; _i++) {
             var e = entities_1[_i];
             if (e.active) {
-                e.position.x += e.velocity.x * game.delta_time;
-                e.position.y += e.velocity.y * game.delta_time;
+                if (e.velocity) {
+                    e.position.x += e.velocity.x * game.delta_time;
+                    e.position.y += e.velocity.y * game.delta_time;
+                }
                 e.sprite.x = e.position.x;
                 e.sprite.y = e.position.y;
+                if (e.bounds) {
+                    e.bounds.x = e.position.x;
+                    e.bounds.y = e.position.y;
+                }
                 if (e.scale)
                     e.sprite.setScale(e.scale.x, e.scale.y);
                 if (e.tint)
@@ -312,7 +318,7 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
             var e = entities_2[_i];
             if (e.player)
                 continue;
-            if (e.active && e.expires != undefined) {
+            if (e.active && e.expires) {
                 e.expires -= game.delta_time;
                 if (e.expires < 0) {
                     e.active = false;
@@ -352,7 +358,8 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
                     y = tween.min;
                     active = false;
                 }
-                e.scale = { x: x, y: y };
+                e.scale.x = x;
+                e.scale.y = y;
                 e.tween.active = active;
             }
         }
@@ -388,7 +395,80 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
         enemyT3 = spawn(enemyT3, 3);
     }
     exports.spawnSystem = spawnSystem;
-    function collisionSystem(game, enemies, bullets) {
+    function intersects(a, b) {
+        var r1 = a.bounds;
+        var r2 = b.bounds;
+        return ((r1.x < r2.x + r2.w) &&
+            (r1.x + r1.w > r2.x) &&
+            (r1.y < r2.y + r2.h) &&
+            (r1.y + r1.h > r2.y));
+    }
+    function handleCollision(game, a, b, bangs, explosions) {
+        for (var _i = 0, bangs_1 = bangs; _i < bangs_1.length; _i++) {
+            var e = bangs_1[_i];
+            if (!e.active) {
+                e.active = true;
+                e.position.x = a.position.x;
+                e.position.y = a.position.y;
+                e.scale.x = 0.2;
+                e.scale.y = 0.2;
+                e.tween.active = true;
+                e.expires = 0.2;
+                game.addSprite(e.sprite);
+                break;
+            }
+        }
+        b.active = false;
+        game.removeSprite(b.sprite);
+        // for (i <- 0 to 3) game.addParticle(b.position.x, b.position.y)
+        if (a.health) {
+            a.health.current -= 2;
+            if (a.health.current < 0) {
+                for (var _a = 0, explosions_1 = explosions; _a < explosions_1.length; _a++) {
+                    var e = explosions_1[_a];
+                    if (!e.active) {
+                        e.active = true;
+                        e.position.x = a.position.x;
+                        e.position.y = a.position.y;
+                        e.tween.active = true;
+                        e.scale.x = 0.5;
+                        e.scale.y = 0.5;
+                        e.expires = 0.2;
+                        game.addSprite(e.sprite);
+                        break;
+                    }
+                }
+                a.active = false;
+                game.removeSprite(a.sprite);
+            }
+        }
+    }
+    // game.addBang(b.position.x, b.position.y)
+    // game.removeEntity(b.id)
+    // for (i <- 0 to 3) game.addParticle(b.position.x, b.position.y)
+    // a.health match {
+    //     case Some(health) => {
+    //         val h = health.current -2
+    //         if (h < 0) {
+    //             game.addExplosion(b.position.x, b.position.y)
+    //             return a.copy(active = false)
+    //         } else {
+    //             return a.copy(health = Some(new Health(h, health.maximum)))
+    //         }   
+    //     }
+    //     case _ => a
+    // }
+    function collisionSystem(game, enemies, bullets, bangs, explosions) {
+        for (var _i = 0, enemies_2 = enemies; _i < enemies_2.length; _i++) {
+            var e = enemies_2[_i];
+            if (e.active)
+                for (var _a = 0, bullets_3 = bullets; _a < bullets_3.length; _a++) {
+                    var b = bullets_3[_a];
+                    if (b.active)
+                        if (intersects(e, b))
+                            handleCollision(game, e, b, bangs, explosions);
+                }
+        }
     }
     exports.collisionSystem = collisionSystem;
 });
@@ -408,13 +488,14 @@ define("game", ["require", "exports", "Sdx", "keys", "entities", "systems"], fun
             if (game.getKey(keys.KEY_ESC))
                 break;
             else {
-                systems.physicsSystem(game, entities.all);
-                systems.removalSystem(game, entities.all);
                 systems.spawnSystem(game, entities.enemies);
-                systems.expireSystem(game, entities.all);
-                //systems.tweenSystem(game, entities.explosions)
-                //systems.tweenSystem(game, entities.bang)
+                systems.collisionSystem(game, entities.enemies, entities.bullets, entities.bangs, entities.explosions);
+                systems.tweenSystem(game, entities.bangs);
+                systems.tweenSystem(game, entities.explosions);
                 systems.inputSystem(game, player, entities.bullets);
+                systems.expireSystem(game, entities.all);
+                systems.removalSystem(game, entities.all);
+                systems.physicsSystem(game, entities.all);
                 game.draw();
             }
         }
