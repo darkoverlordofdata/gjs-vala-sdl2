@@ -2,7 +2,6 @@
  * Systems
  */
 import * as sdx from 'Sdx'
-import * as keys from 'keys'
 
 const fireRate = 0.1
 let timeToFire = 0
@@ -10,19 +9,34 @@ let enemyT1 = 2
 let enemyT2 = 7
 let enemyT3 = 13
 
+export function inputSystem(game, entities) {
+    const player = entities.pool[0]
+    player.position.x = game.mouse_x
+    player.position.y = game.mouse_y
+    if (game.mouse_down || game.getKey(sdx.InputKeys.z)) { /* fire system */
+        timeToFire -= game.delta_time
+        if (timeToFire < 0) {
+            timeToFire = fireRate
+            entities.newBullet(game, game.mouse_x+27, game.mouse_y+2)
+            entities.newBullet(game, game.mouse_x-27, game.mouse_y+2)
+        }
+    }
+}
+
 export function physicsSystem(game, entities) {
-    for (let e of entities) {
+    for (let e of entities.active) {
         if (e.active) {
             if (e.velocity) {
                 e.position.x += e.velocity.x * game.delta_time
                 e.position.y += e.velocity.y * game.delta_time
             }
+            if (e.bounds) {     // adjust bounds 'hit zone'
+                e.bounds.x = e.position.x - e.bounds.w/8
+                e.bounds.y = e.position.y - e.bounds.h/2
+            }
+            // update the sprite object
             e.sprite.x = e.position.x
             e.sprite.y = e.position.y
-            if (e.bounds) {
-                e.bounds.x = e.position.x
-                e.bounds.y = e.position.y
-            }
             if (e.scale) e.sprite.setScale(e.scale.x, e.scale.y)
             if (e.tint) e.sprite.setColor(e.tint.r, e.tint.g, e.tint.b)
             
@@ -30,60 +44,29 @@ export function physicsSystem(game, entities) {
     }
 }
 
-export function inputSystem(game, player, bullets) {
-    player.position.x = game.mouse_x
-    player.position.y = game.mouse_y
-    if (game.mouse_down || game.getKey(keys.KEY_z)) { /* fire system */
-        timeToFire -= game.delta_time
-        if (timeToFire < 0) {
-            timeToFire = fireRate
-            for (let e of bullets) {
-                if (!e.active) {
-                    e.active = true
-                    e.position.x = game.mouse_x+27
-                    e.position.y = game.mouse_y+2
-                    game.addSprite(e.sprite)
-                    break
-                }
-            }
-            for (let e of bullets) {
-                if (!e.active) {
-                    e.active = true
-                    e.position.x = game.mouse_x-27
-                    e.position.y = game.mouse_y+2
-                    game.addSprite(e.sprite)
-                    break
-                }
-            }
-        }
-    }
-}
-
 export function expireSystem(game, entities) {
-    for (let e of entities) {
+    for (let e of entities.active) {
         if (e.player) continue
         if (e.active && e.expires) {
             e.expires -= game.delta_time
             if (e.expires < 0) {
-                e.active = false
-                game.removeSprite(e.sprite)
+                entities.deactivate(game, e)
             }
         }
     }
 }
 
 export function removalSystem(game, entities) {
-    for (let e of entities) {
+    for (let e of entities.active) {
         if (e.player) continue
         if (e.active && e.position.y < 0 || e.position.y > game.height) {
-            game.removeSprite(e.sprite)
-            e.active = false
+            entities.deactivate(game, e)
         }
     }
 }
 
 export function tweenSystem(game, entities) {
-    for (let e of entities) {
+    for (let e of entities.active) {
         if (e.active && e.tween) {
             let tween = e.tween
             let x = e.scale.x + (tween.speed * game.delta_time)
@@ -106,32 +89,21 @@ export function tweenSystem(game, entities) {
     }
 }
 
-export function spawnSystem(game, enemies) {
+export function spawnSystem(game, entities) {
     function spawn(t, enemy) {
         const d1 = t-game.delta_time
         if (d1<0) {
-            for (let e of enemies) {
-                if (!e.active && e.model === enemy) {
-                    e.position.x = Math.random()*game.width - e.bounds.w/2
-                    e.position.y = e.bounds.h
-                    e.health.current = e.health.maximum
-                    e.active = true
-                    game.addSprite(e.sprite)
-                    break
-                }
-            }
             switch(enemy) {
-                case 1: return 2
-                case 2: return 7
-                case 3: return 13
-                default: return 0
+                case 1: entities.newEnemy1(game); return 2
+                case 2: entities.newEnemy2(game); return 7
+                case 3: entities.newEnemy3(game); return 13
+                default: throw new Error("WTF")
             }
         } else return d1
     }
     enemyT1 = spawn(enemyT1, 1)
     enemyT2 = spawn(enemyT2, 2)
     enemyT3 = spawn(enemyT3, 3)
-
 }
 
 function intersects(a, b) {
@@ -143,64 +115,30 @@ function intersects(a, b) {
             (r1.y + r1.h > r2.y)) 
     
 }
-function handleCollision(game, a, b, bangs, explosions) {
-    for (let e of bangs) {
-        if (!e.active) {
-            e.active = true
-            e.position.x = a.position.x
-            e.position.y = a.position.y
-            e.scale.x = 0.2
-            e.scale.y = 0.2
-            e.tween.active = true
-            e.expires = 0.2
-            game.addSprite(e.sprite)
-            break
-        }
+
+function handleCollision(game, enemy, bullet, entities) {
+    let x = bullet.position.x
+    let y = bullet.position.y
+    entities.newBang(game, x, y)
+    entities.deactivate(game, bullet)
+    for (let i=0; i<4; i++) {
+        entities.newParticle(game, x, y)
     }
-    b.active = false
-    game.removeSprite(b.sprite)
-    // for (i <- 0 to 3) game.addParticle(b.position.x, b.position.y)
-    if (a.health) {
-        a.health.current -= 2
-        if (a.health.current < 0) {
-            for (let e of explosions) {
-                if (!e.active) {
-                    e.active = true
-                    e.position.x = a.position.x
-                    e.position.y = a.position.y
-                    e.tween.active = true
-                    e.scale.x = 0.5
-                    e.scale.y = 0.5
-                    e.expires = 0.2
-                    game.addSprite(e.sprite)
-                    break
-                }
-            }
-            a.active = false
-            game.removeSprite(a.sprite)
+    if (enemy.health) {
+        enemy.health.current -= 2
+        if (enemy.health.current < 0) {
+            x = enemy.position.x
+            y = enemy.position.y
+            entities.deactivate(game, enemy)
+            entities.newExplosion(game, x, y)
         }
     }
 }
-// game.addBang(b.position.x, b.position.y)
-// game.removeEntity(b.id)
-// for (i <- 0 to 3) game.addParticle(b.position.x, b.position.y)
-// a.health match {
-//     case Some(health) => {
-//         val h = health.current -2
-//         if (h < 0) {
-//             game.addExplosion(b.position.x, b.position.y)
-//             return a.copy(active = false)
-//         } else {
-//             return a.copy(health = Some(new Health(h, health.maximum)))
-//         }   
-//     }
-//     case _ => a
-// }
     
-export function collisionSystem(game, enemies, bullets, bangs, explosions) {
-    for (let e of enemies) 
-        if (e.active) 
-            for (let b of bullets) 
-                if (b.active) 
-                    if (intersects(e, b)) handleCollision(game, e, b, bangs, explosions)
+export function collisionSystem(game, entities) {
+    for (let e of entities.active) 
+        if (e.active && e.enemy) 
+            for (let b of entities.active) 
+                if (b.active && b.bullet) 
+                    if (intersects(e, b)) handleCollision(game, e, b, entities)
 }

@@ -9,6 +9,7 @@ namespace sdx
     class JsGame : Object implements IApplication
 
         const YieldForEventsMS: int = 1000
+        prop profile: bool = true
         prop mouse_down: bool
         prop mouse_x: int = 0
         prop mouse_y: int = 0
@@ -41,6 +42,13 @@ namespace sdx
         lastTime: private double //= (double)GLib.get_real_time()/1000000.0
         currentTime: private double = 0 
         elapsed: private double = 0
+
+
+        k: int
+        t: double
+        t1: double = 0.0
+        t2: double = 0.0
+        t3: double = 0.0
 
 
         construct(name:string, height:int, width:int, base:string)
@@ -136,9 +144,21 @@ namespace sdx
             _delta_time = Sdx.graphics.deltaTime
             if (_delta_time > 1) do _delta_time = 1.0/60.0
             _fps = Sdx.graphics.fps
+            if profile do t1 = (double)GLib.get_real_time()/1000000.0
+            
             return evt.type
 
         def draw()
+            if profile
+                t2 = (double)GLib.get_real_time()/1000000.0
+                t3 = t2 - t1
+                t = t + t3
+                k += 1
+                if k == 1000
+                    k = 0
+                    t = t / 1000.0
+                    print "%f", t
+                    t = 0
             renderer.set_draw_color(0x0, 0x0, 0x0, 0x0)
             renderer.clear()
 

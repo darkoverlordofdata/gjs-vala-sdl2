@@ -55,9 +55,203 @@ define("keys", ["require", "exports"], function (require, exports) {
 define("entities", ["require", "exports", "Sdx"], function (require, exports, sdx) {
     "use strict";
     var Tau = 6.28318;
+    var BULLETS = 20;
+    var ENEMY1 = 9;
+    var ENEMY2 = 7;
+    var ENEMY3 = 5;
+    var ENEMIES = ENEMY1 + ENEMY2 + ENEMY3;
+    var EXPLOSIONS = 8;
+    var BANGS = 16;
+    var PARTICLES = 40;
+    var bulletQ = [];
+    var particleQ = [];
+    var explosionQ = [];
+    var bangQ = [];
+    var enemy1Q = [];
+    var enemy2Q = [];
+    var enemy3Q = [];
+    exports.pool = new Array(2 + BULLETS + ENEMIES + EXPLOSIONS + BANGS + PARTICLES);
+    exports.active = [];
+    var uniqueId = 0;
+    Array.prototype.remove = function (e) {
+        var i = this.indexOf(e);
+        if (i > -1) {
+            if (this[i].id !== e.id)
+                throw new Error("Invalid remove id");
+            return this.splice(i, 1);
+        }
+        else {
+            print(JSON.stringify(e, null, 2));
+            throw new Error("Unable to remove " + e.id);
+            return null;
+        }
+    };
+    function createPool(game) {
+        var z = 0;
+        exports.active.push(exports.pool[z++] = createPlayer());
+        exports.active.push(exports.pool[z++] = createBackground());
+        for (var i = 0; i < BULLETS; i++)
+            bulletQ.push(exports.pool[z++] = createBullet());
+        for (var i = 0; i < ENEMY1; i++)
+            enemy1Q.push(exports.pool[z++] = createEnemy1());
+        for (var i = 0; i < ENEMY2; i++)
+            enemy2Q.push(exports.pool[z++] = createEnemy2());
+        for (var i = 0; i < ENEMY3; i++)
+            enemy3Q.push(exports.pool[z++] = createEnemy3());
+        for (var i = 0; i < EXPLOSIONS; i++)
+            explosionQ.push(exports.pool[z++] = createExplosion());
+        for (var i = 0; i < BANGS; i++)
+            bangQ.push(exports.pool[z++] = createBang());
+        for (var i = 0; i < PARTICLES; i++)
+            particleQ.push(exports.pool[z++] = createParticle());
+        game.addSprite(exports.active[0].sprite);
+        game.addSprite(exports.active[1].sprite);
+        Object.freeze(exports.pool);
+    }
+    exports.createPool = createPool;
+    function deactivate(game, e) {
+        e.active = false;
+        var z = exports.active.remove(e);
+        if (z[0].id !== e.id) {
+            throw new Error("removed wrong entity");
+        }
+        game.removeSprite(e.sprite);
+        if (e.bang)
+            bangQ.push(e);
+        else if (e.particle)
+            particleQ.push(e);
+        else if (e.explosion)
+            explosionQ.push(e);
+        else if (e.bullet)
+            bulletQ.push(e);
+        else if (e.enemy)
+            switch (e.model) {
+                case 1:
+                    enemy1Q.push(e);
+                    break;
+                case 2:
+                    enemy2Q.push(e);
+                    break;
+                case 3:
+                    enemy3Q.push(e);
+                    break;
+            }
+    }
+    exports.deactivate = deactivate;
+    function newBang(game, x, y) {
+        if (bangQ.length) {
+            var e = bangQ.pop();
+            e.active = true;
+            e.position.x = x;
+            e.position.y = y;
+            e.scale.x = 0.2;
+            e.scale.y = 0.2;
+            e.tween.active = true;
+            e.expires = 0.2;
+            game.addSprite(e.sprite);
+            exports.active.push(e);
+        }
+        else {
+            throw new Error("Unable to allocate bang");
+        }
+    }
+    exports.newBang = newBang;
+    function newParticle(game, x, y) {
+        if (particleQ.length) {
+            var e = particleQ.pop();
+            e.active = true;
+            e.position.x = x;
+            e.position.y = y;
+            e.expires = 0.2;
+            game.addSprite(e.sprite);
+            exports.active.push(e);
+        }
+        else {
+            throw new Error("Unable to allocate particle");
+        }
+    }
+    exports.newParticle = newParticle;
+    function newExplosion(game, x, y) {
+        if (explosionQ.length) {
+            var e = explosionQ.pop();
+            e.active = true;
+            e.position.x = x;
+            e.position.y = y;
+            e.tween.active = true;
+            e.scale.x = 0.5;
+            e.scale.y = 0.5;
+            e.expires = 0.2;
+            game.addSprite(e.sprite);
+            exports.active.push(e);
+        }
+        else {
+            throw new Error("Unable to allocate explosion");
+        }
+    }
+    exports.newExplosion = newExplosion;
+    function newBullet(game, x, y) {
+        if (bulletQ.length) {
+            var e = bulletQ.pop();
+            e.active = true;
+            e.position.x = x;
+            e.position.y = y;
+            game.addSprite(e.sprite);
+            exports.active.push(e);
+        }
+        else {
+            throw new Error("Unable to allocate bullet");
+        }
+    }
+    exports.newBullet = newBullet;
+    function newEnemy1(game) {
+        if (enemy1Q.length) {
+            var e = enemy1Q.pop();
+            e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
+            e.position.y = e.bounds.h;
+            e.health.current = e.health.maximum;
+            e.active = true;
+            game.addSprite(e.sprite);
+            exports.active.push(e);
+        }
+        else {
+            throw new Error("Unable to allocate enemy1");
+        }
+    }
+    exports.newEnemy1 = newEnemy1;
+    function newEnemy2(game) {
+        if (enemy2Q.length) {
+            var e = enemy2Q.pop();
+            e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
+            e.position.y = e.bounds.h;
+            e.health.current = e.health.maximum;
+            e.active = true;
+            game.addSprite(e.sprite);
+            exports.active.push(e);
+        }
+        else {
+            throw new Error("Unable to allocate enemy2");
+        }
+    }
+    exports.newEnemy2 = newEnemy2;
+    function newEnemy3(game) {
+        if (enemy3Q.length) {
+            var e = enemy3Q.pop();
+            e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
+            e.position.y = e.bounds.h;
+            e.health.current = e.health.maximum;
+            e.active = true;
+            game.addSprite(e.sprite);
+            exports.active.push(e);
+        }
+        else {
+            throw new Error("Unable to allocate enemy3");
+        }
+    }
+    exports.newEnemy3 = newEnemy3;
     function createBackground() {
         // sprite defaults to layer 0
         return {
+            id: uniqueId++,
             active: true,
             scale: { x: 3, y: 3 },
             position: { x: 0, y: 0 },
@@ -69,6 +263,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         var sprite = sdx.createSprite('images/spaceshipspr.png');
         sprite.layer = 8;
         return {
+            id: uniqueId++,
             player: true,
             active: true,
             bounds: { x: 0, y: 0, w: sprite.width, h: sprite.height },
@@ -81,6 +276,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         var sprite = sdx.createSprite('images/bullet.png');
         sprite.layer = 9;
         return {
+            id: uniqueId++,
+            bullet: true,
             active: false,
             bounds: { x: 0, y: 0, w: sprite.width, h: sprite.height },
             position: { x: 0, y: 0 },
@@ -93,6 +290,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         var sprite = sdx.createSprite('images/enemy1.png');
         sprite.layer = 5;
         return {
+            id: uniqueId++,
+            enemy: true,
             active: false,
             model: 1,
             bounds: { x: 0, y: 0, w: sprite.width, h: sprite.height },
@@ -106,6 +305,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         var sprite = sdx.createSprite('images/enemy2.png');
         sprite.layer = 6;
         return {
+            id: uniqueId++,
+            enemy: true,
             active: false,
             model: 2,
             bounds: { x: 0, y: 0, w: sprite.width, h: sprite.height },
@@ -119,6 +320,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         var sprite = sdx.createSprite('images/enemy3.png');
         sprite.layer = 7;
         return {
+            id: uniqueId++,
+            enemy: true,
             active: false,
             model: 3,
             bounds: { x: 0, y: 0, w: sprite.width, h: sprite.height },
@@ -132,6 +335,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         var sprite = sdx.createSprite('images/explosion.png');
         sprite.layer = 10;
         return {
+            id: uniqueId++,
+            explosion: true,
             active: false,
             bounds: { x: 0, y: 0, w: sprite.width, h: sprite.height },
             position: { x: 0, y: 0 },
@@ -146,6 +351,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         var sprite = sdx.createSprite('images/explosion.png');
         sprite.layer = 10;
         return {
+            id: uniqueId++,
+            bang: true,
             active: false,
             bounds: { x: 0, y: 0, w: sprite.width, h: sprite.height },
             position: { x: 0, y: 0 },
@@ -161,97 +368,22 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         var magnitude = Math.ceil(Math.random() * 200);
         var velocityX = magnitude * Math.cos(radians);
         var velocityY = magnitude * Math.sin(radians);
-        var scale = Math.random() * 10;
+        var scale = Math.random();
         var sprite = sdx.createSprite('images/star.png');
         sprite.layer = 10;
         return {
+            id: uniqueId++,
+            particle: true,
             active: false,
             bounds: { x: 0, y: 0, w: sprite.width, h: sprite.height },
             position: { x: 0, y: 0 },
             scale: { x: scale, y: scale },
             velocity: { x: velocityX, y: velocityY },
             tint: { r: 0xfa, g: 0xfa, b: 0xd2, a: 0xff },
-            expires: 0.5,
+            expires: 0.4,
             sprite: sprite
         };
     }
-    exports.all = new Array(27);
-    exports.bullets = new Array(20);
-    exports.enemies = new Array(18);
-    exports.explosions = new Array(8);
-    exports.bangs = new Array(8);
-    function createAll(game) {
-        var z = 0; // entity 
-        var b = 0; // bullets
-        var e = 0; // enemies
-        var x = 0; // explosions
-        var g = 0; // bang
-        var p = 0; // particle
-        exports.all[z++] = createBackground();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.bullets[b++] = createBullet();
-        exports.all[z++] = exports.enemies[e++] = createEnemy1();
-        exports.all[z++] = exports.enemies[e++] = createEnemy1();
-        exports.all[z++] = exports.enemies[e++] = createEnemy1();
-        exports.all[z++] = exports.enemies[e++] = createEnemy1();
-        exports.all[z++] = exports.enemies[e++] = createEnemy1();
-        exports.all[z++] = exports.enemies[e++] = createEnemy1();
-        exports.all[z++] = exports.enemies[e++] = createEnemy1();
-        exports.all[z++] = exports.enemies[e++] = createEnemy2();
-        exports.all[z++] = exports.enemies[e++] = createEnemy2();
-        exports.all[z++] = exports.enemies[e++] = createEnemy2();
-        exports.all[z++] = exports.enemies[e++] = createEnemy2();
-        exports.all[z++] = exports.enemies[e++] = createEnemy2();
-        exports.all[z++] = exports.enemies[e++] = createEnemy2();
-        exports.all[z++] = exports.enemies[e++] = createEnemy2();
-        exports.all[z++] = exports.enemies[e++] = createEnemy3();
-        exports.all[z++] = exports.enemies[e++] = createEnemy3();
-        exports.all[z++] = exports.enemies[e++] = createEnemy3();
-        exports.all[z++] = exports.enemies[e++] = createEnemy3();
-        exports.all[z++] = exports.enemies[e++] = createEnemy3();
-        exports.all[z++] = exports.enemies[e++] = createEnemy3();
-        exports.all[z++] = exports.enemies[e++] = createEnemy3();
-        exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.explosions[x++] = createExplosion();
-        exports.all[z++] = exports.bangs[g++] = createBang();
-        exports.all[z++] = exports.bangs[g++] = createBang();
-        exports.all[z++] = exports.bangs[g++] = createBang();
-        exports.all[z++] = exports.bangs[g++] = createBang();
-        exports.all[z++] = exports.bangs[g++] = createBang();
-        exports.all[z++] = exports.bangs[g++] = createBang();
-        exports.all[z++] = exports.bangs[g++] = createBang();
-        exports.all[z++] = exports.bangs[g++] = createBang();
-        var player = exports.all[z++] = createPlayer();
-        game.addSprite(exports.all[0].sprite);
-        game.addSprite(player.sprite);
-        return player;
-    }
-    exports.createAll = createAll;
 });
 define("systems", ["require", "exports", "keys"], function (require, exports, keys) {
     "use strict";
@@ -261,19 +393,20 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
     var enemyT2 = 7;
     var enemyT3 = 13;
     function physicsSystem(game, entities) {
-        for (var _i = 0, entities_1 = entities; _i < entities_1.length; _i++) {
-            var e = entities_1[_i];
+        for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
+            var e = _a[_i];
             if (e.active) {
                 if (e.velocity) {
                     e.position.x += e.velocity.x * game.delta_time;
                     e.position.y += e.velocity.y * game.delta_time;
                 }
+                if (e.bounds) {
+                    e.bounds.x = e.position.x - e.bounds.w / 8;
+                    e.bounds.y = e.position.y - e.bounds.h / 2;
+                }
+                // update the sprite object
                 e.sprite.x = e.position.x;
                 e.sprite.y = e.position.y;
-                if (e.bounds) {
-                    e.bounds.x = e.position.x;
-                    e.bounds.y = e.position.y;
-                }
                 if (e.scale)
                     e.sprite.setScale(e.scale.x, e.scale.y);
                 if (e.tint)
@@ -282,67 +415,48 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
         }
     }
     exports.physicsSystem = physicsSystem;
-    function inputSystem(game, player, bullets) {
+    function inputSystem(game, entities) {
+        var player = entities.pool[0];
         player.position.x = game.mouse_x;
         player.position.y = game.mouse_y;
         if (game.mouse_down || game.getKey(keys.KEY_z)) {
             timeToFire -= game.delta_time;
             if (timeToFire < 0) {
                 timeToFire = fireRate;
-                for (var _i = 0, bullets_1 = bullets; _i < bullets_1.length; _i++) {
-                    var e = bullets_1[_i];
-                    if (!e.active) {
-                        e.active = true;
-                        e.position.x = game.mouse_x + 27;
-                        e.position.y = game.mouse_y + 2;
-                        game.addSprite(e.sprite);
-                        break;
-                    }
-                }
-                for (var _a = 0, bullets_2 = bullets; _a < bullets_2.length; _a++) {
-                    var e = bullets_2[_a];
-                    if (!e.active) {
-                        e.active = true;
-                        e.position.x = game.mouse_x - 27;
-                        e.position.y = game.mouse_y + 2;
-                        game.addSprite(e.sprite);
-                        break;
-                    }
-                }
+                entities.newBullet(game, game.mouse_x + 27, game.mouse_y + 2);
+                entities.newBullet(game, game.mouse_x - 27, game.mouse_y + 2);
             }
         }
     }
     exports.inputSystem = inputSystem;
     function expireSystem(game, entities) {
-        for (var _i = 0, entities_2 = entities; _i < entities_2.length; _i++) {
-            var e = entities_2[_i];
+        for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
+            var e = _a[_i];
             if (e.player)
                 continue;
             if (e.active && e.expires) {
                 e.expires -= game.delta_time;
                 if (e.expires < 0) {
-                    e.active = false;
-                    game.removeSprite(e.sprite);
+                    entities.deactivate(game, e);
                 }
             }
         }
     }
     exports.expireSystem = expireSystem;
     function removalSystem(game, entities) {
-        for (var _i = 0, entities_3 = entities; _i < entities_3.length; _i++) {
-            var e = entities_3[_i];
+        for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
+            var e = _a[_i];
             if (e.player)
                 continue;
             if (e.active && e.position.y < 0 || e.position.y > game.height) {
-                game.removeSprite(e.sprite);
-                e.active = false;
+                entities.deactivate(game, e);
             }
         }
     }
     exports.removalSystem = removalSystem;
     function tweenSystem(game, entities) {
-        for (var _i = 0, entities_4 = entities; _i < entities_4.length; _i++) {
-            var e = entities_4[_i];
+        for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
+            var e = _a[_i];
             if (e.active && e.tween) {
                 var tween = e.tween;
                 var x = e.scale.x + (tween.speed * game.delta_time);
@@ -365,26 +479,21 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
         }
     }
     exports.tweenSystem = tweenSystem;
-    function spawnSystem(game, enemies) {
+    function spawnSystem(game, entities) {
         function spawn(t, enemy) {
             var d1 = t - game.delta_time;
             if (d1 < 0) {
-                for (var _i = 0, enemies_1 = enemies; _i < enemies_1.length; _i++) {
-                    var e = enemies_1[_i];
-                    if (!e.active && e.model === enemy) {
-                        e.position.x = Math.random() * game.width - e.bounds.w / 2;
-                        e.position.y = e.bounds.h;
-                        e.health.current = e.health.maximum;
-                        e.active = true;
-                        game.addSprite(e.sprite);
-                        break;
-                    }
-                }
                 switch (enemy) {
-                    case 1: return 2;
-                    case 2: return 7;
-                    case 3: return 13;
-                    default: return 0;
+                    case 1:
+                        entities.newEnemy1(game);
+                        return 2;
+                    case 2:
+                        entities.newEnemy2(game);
+                        return 7;
+                    case 3:
+                        entities.newEnemy3(game);
+                        return 13;
+                    default: throw new Error("WTF");
                 }
             }
             else
@@ -403,70 +512,33 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
             (r1.y < r2.y + r2.h) &&
             (r1.y + r1.h > r2.y));
     }
-    function handleCollision(game, a, b, bangs, explosions) {
-        for (var _i = 0, bangs_1 = bangs; _i < bangs_1.length; _i++) {
-            var e = bangs_1[_i];
-            if (!e.active) {
-                e.active = true;
-                e.position.x = a.position.x;
-                e.position.y = a.position.y;
-                e.scale.x = 0.2;
-                e.scale.y = 0.2;
-                e.tween.active = true;
-                e.expires = 0.2;
-                game.addSprite(e.sprite);
-                break;
-            }
+    function handleCollision(game, enemy, bullet, entities) {
+        var x = bullet.position.x;
+        var y = bullet.position.y;
+        entities.newBang(game, x, y);
+        entities.deactivate(game, bullet);
+        for (var i = 0; i < 4; i++) {
+            entities.newParticle(game, x, y);
         }
-        b.active = false;
-        game.removeSprite(b.sprite);
-        // for (i <- 0 to 3) game.addParticle(b.position.x, b.position.y)
-        if (a.health) {
-            a.health.current -= 2;
-            if (a.health.current < 0) {
-                for (var _a = 0, explosions_1 = explosions; _a < explosions_1.length; _a++) {
-                    var e = explosions_1[_a];
-                    if (!e.active) {
-                        e.active = true;
-                        e.position.x = a.position.x;
-                        e.position.y = a.position.y;
-                        e.tween.active = true;
-                        e.scale.x = 0.5;
-                        e.scale.y = 0.5;
-                        e.expires = 0.2;
-                        game.addSprite(e.sprite);
-                        break;
-                    }
-                }
-                a.active = false;
-                game.removeSprite(a.sprite);
+        if (enemy.health) {
+            enemy.health.current -= 2;
+            if (enemy.health.current < 0) {
+                x = enemy.position.x;
+                y = enemy.position.y;
+                entities.deactivate(game, enemy);
+                entities.newExplosion(game, x, y);
             }
         }
     }
-    // game.addBang(b.position.x, b.position.y)
-    // game.removeEntity(b.id)
-    // for (i <- 0 to 3) game.addParticle(b.position.x, b.position.y)
-    // a.health match {
-    //     case Some(health) => {
-    //         val h = health.current -2
-    //         if (h < 0) {
-    //             game.addExplosion(b.position.x, b.position.y)
-    //             return a.copy(active = false)
-    //         } else {
-    //             return a.copy(health = Some(new Health(h, health.maximum)))
-    //         }   
-    //     }
-    //     case _ => a
-    // }
-    function collisionSystem(game, enemies, bullets, bangs, explosions) {
-        for (var _i = 0, enemies_2 = enemies; _i < enemies_2.length; _i++) {
-            var e = enemies_2[_i];
-            if (e.active)
-                for (var _a = 0, bullets_3 = bullets; _a < bullets_3.length; _a++) {
-                    var b = bullets_3[_a];
-                    if (b.active)
+    function collisionSystem(game, entities) {
+        for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
+            var e = _a[_i];
+            if (e.active && e.enemy)
+                for (var _b = 0, _c = entities.active; _b < _c.length; _b++) {
+                    var b = _c[_b];
+                    if (b.active && b.bullet)
                         if (intersects(e, b))
-                            handleCollision(game, e, b, bangs, explosions);
+                            handleCollision(game, e, b, entities);
                 }
         }
     }
@@ -476,26 +548,21 @@ define("game", ["require", "exports", "Sdx", "keys", "entities", "systems"], fun
     "use strict";
     function main() {
         var game = sdx.createGame("ShmupWarz", 640, 640, DATADIR);
-        // const bgd = sdx.createSprite('images/BackdropBlackLittleSparkBlack.png')
-        // const player = sdx.createSprite('images/spaceshipspr.png')
-        // bgd.setScale(3, 3)
-        // game.addSprite(bgd)
-        // game.addSprite(player)
-        var player = entities.createAll(game);
+        entities.createPool(game);
+        game.profile = true;
         game.start();
         while (game.running) {
             game.handleEvents();
             if (game.getKey(keys.KEY_ESC))
                 break;
             else {
-                systems.spawnSystem(game, entities.enemies);
-                systems.collisionSystem(game, entities.enemies, entities.bullets, entities.bangs, entities.explosions);
-                systems.tweenSystem(game, entities.bangs);
-                systems.tweenSystem(game, entities.explosions);
-                systems.inputSystem(game, player, entities.bullets);
-                systems.expireSystem(game, entities.all);
-                systems.removalSystem(game, entities.all);
-                systems.physicsSystem(game, entities.all);
+                systems.collisionSystem(game, entities);
+                systems.expireSystem(game, entities);
+                systems.removalSystem(game, entities);
+                systems.spawnSystem(game, entities);
+                systems.tweenSystem(game, entities);
+                systems.inputSystem(game, entities);
+                systems.physicsSystem(game, entities);
                 game.draw();
             }
         }
