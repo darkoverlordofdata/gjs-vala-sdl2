@@ -71,7 +71,7 @@ export function deactivate(game, e) {
     
 }
 
-export function newBang(game, x, y) {
+export function bang(game, x, y) {
     if (bangQ.length) {
         const e = bangQ.pop()
         e.active = true
@@ -88,7 +88,7 @@ export function newBang(game, x, y) {
     }
 }
 
-export function newParticle(game, x, y) {
+export function particle(game, x, y) {
     if (particleQ.length) {
         const e = particleQ.pop()
         e.active = true
@@ -103,7 +103,7 @@ export function newParticle(game, x, y) {
     
 }
 
-export function newExplosion(game, x, y) {
+export function explosion(game, x, y) {
     if (explosionQ.length) {
         const e = explosionQ.pop()
         e.active = true
@@ -120,7 +120,7 @@ export function newExplosion(game, x, y) {
     }
 }
 
-export function newBullet(game, x, y) {
+export function bullet(game, x, y) {
     if (bulletQ.length) {
         const e = bulletQ.pop()
         e.active = true
@@ -133,7 +133,7 @@ export function newBullet(game, x, y) {
     }
 }
 
-export function newEnemy1(game) {
+export function enemy1(game) {
     if (enemy1Q.length) {
         const e = enemy1Q.pop()
         e.position.x = Math.random()*(game.width - e.bounds.w) + e.bounds.w/2
@@ -147,7 +147,7 @@ export function newEnemy1(game) {
     }
 }
 
-export function newEnemy2(game) {
+export function enemy2(game) {
     if (enemy2Q.length) {
         const e = enemy2Q.pop()
         e.position.x = Math.random()*(game.width - e.bounds.w) + e.bounds.w/2
@@ -161,7 +161,7 @@ export function newEnemy2(game) {
     }
 }
 
-export function newEnemy3(game) {
+export function enemy3(game) {
     if (enemy3Q.length) {
         const e = enemy3Q.pop()
         e.position.x = Math.random()*(game.width - e.bounds.w) + e.bounds.w/2

@@ -7,7 +7,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "program": "/bin/sh",
-            "args": ["./run.sh"]
+            "args": ["./run"]
         }
     ]
 }

@@ -11,7 +11,7 @@
         {
             "isBuildCommand": true,
             "taskName": "build",
-            "args": ["./build.sh"]
+            "args": ["./build"]
         }
     ]
 }

@@ -23,6 +23,10 @@ using the same functional ecs style, I get performance similar to fsharp and sca
 0.001902
 0.001992
 
+0.002080
+0.002304
+0.002322
+
 fsharp          0.001651
 scala-native    0.001812
 ooc             0.002586

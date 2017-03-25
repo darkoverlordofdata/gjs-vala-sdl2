@@ -3,7 +3,12 @@
         "Sdx": {
             "source": "/home/bruce/.local/lib//sdx-0.1.gir",
             "output": "src/js/sdx-0.1.d.ts",
-            "import": ["GObject"]
+            "import": ["GObject"],
+            "patch": {
+                "scenesscene2dActor": {
+                    "notify":"notify(property_name: string):void"
+                }
+            }
         },
         "GObject": {
             "source": "/usr/share/gir-1.0/GObject-2.0.gir",

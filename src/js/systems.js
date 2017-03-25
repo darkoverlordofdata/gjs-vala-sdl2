@@ -17,8 +17,8 @@ export function inputSystem(game, entities) {
         timeToFire -= game.delta_time
         if (timeToFire < 0) {
             timeToFire = fireRate
-            entities.newBullet(game, game.mouse_x+27, game.mouse_y+2)
-            entities.newBullet(game, game.mouse_x-27, game.mouse_y+2)
+            entities.bullet(game, game.mouse_x+27, game.mouse_y+2)
+            entities.bullet(game, game.mouse_x-27, game.mouse_y+2)
         }
     }
 }
@@ -94,9 +94,9 @@ export function spawnSystem(game, entities) {
         const d1 = t-game.delta_time
         if (d1<0) {
             switch(enemy) {
-                case 1: entities.newEnemy1(game); return 2
-                case 2: entities.newEnemy2(game); return 7
-                case 3: entities.newEnemy3(game); return 13
+                case 1: entities.enemy1(game); return 2
+                case 2: entities.enemy2(game); return 7
+                case 3: entities.enemy3(game); return 13
                 default: throw new Error("WTF")
             }
         } else return d1
@@ -104,6 +104,14 @@ export function spawnSystem(game, entities) {
     enemyT1 = spawn(enemyT1, 1)
     enemyT2 = spawn(enemyT2, 2)
     enemyT3 = spawn(enemyT3, 3)
+}
+
+export function collisionSystem(game, entities) {
+    for (let e of entities.active) 
+        if (e.active && e.enemy) 
+            for (let b of entities.active) 
+                if (b.active && b.bullet) 
+                    if (intersects(e, b)) handleCollision(game, e, b, entities)
 }
 
 function intersects(a, b) {
@@ -119,10 +127,10 @@ function intersects(a, b) {
 function handleCollision(game, enemy, bullet, entities) {
     let x = bullet.position.x
     let y = bullet.position.y
-    entities.newBang(game, x, y)
+    entities.bang(game, x, y)
     entities.deactivate(game, bullet)
     for (let i=0; i<4; i++) {
-        entities.newParticle(game, x, y)
+        entities.particle(game, x, y)
     }
     if (enemy.health) {
         enemy.health.current -= 2
@@ -130,15 +138,8 @@ function handleCollision(game, enemy, bullet, entities) {
             x = enemy.position.x
             y = enemy.position.y
             entities.deactivate(game, enemy)
-            entities.newExplosion(game, x, y)
+            entities.explosion(game, x, y)
         }
     }
 }
     
-export function collisionSystem(game, entities) {
-    for (let e of entities.active) 
-        if (e.active && e.enemy) 
-            for (let b of entities.active) 
-                if (b.active && b.bullet) 
-                    if (intersects(e, b)) handleCollision(game, e, b, entities)
-}

@@ -132,7 +132,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             }
     }
     exports.deactivate = deactivate;
-    function newBang(game, x, y) {
+    function bang(game, x, y) {
         if (bangQ.length) {
             var e = bangQ.pop();
             e.active = true;
@@ -149,8 +149,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate bang");
         }
     }
-    exports.newBang = newBang;
-    function newParticle(game, x, y) {
+    exports.bang = bang;
+    function particle(game, x, y) {
         if (particleQ.length) {
             var e = particleQ.pop();
             e.active = true;
@@ -164,8 +164,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate particle");
         }
     }
-    exports.newParticle = newParticle;
-    function newExplosion(game, x, y) {
+    exports.particle = particle;
+    function explosion(game, x, y) {
         if (explosionQ.length) {
             var e = explosionQ.pop();
             e.active = true;
@@ -182,8 +182,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate explosion");
         }
     }
-    exports.newExplosion = newExplosion;
-    function newBullet(game, x, y) {
+    exports.explosion = explosion;
+    function bullet(game, x, y) {
         if (bulletQ.length) {
             var e = bulletQ.pop();
             e.active = true;
@@ -196,8 +196,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate bullet");
         }
     }
-    exports.newBullet = newBullet;
-    function newEnemy1(game) {
+    exports.bullet = bullet;
+    function enemy1(game) {
         if (enemy1Q.length) {
             var e = enemy1Q.pop();
             e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
@@ -211,8 +211,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate enemy1");
         }
     }
-    exports.newEnemy1 = newEnemy1;
-    function newEnemy2(game) {
+    exports.enemy1 = enemy1;
+    function enemy2(game) {
         if (enemy2Q.length) {
             var e = enemy2Q.pop();
             e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
@@ -226,8 +226,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate enemy2");
         }
     }
-    exports.newEnemy2 = newEnemy2;
-    function newEnemy3(game) {
+    exports.enemy2 = enemy2;
+    function enemy3(game) {
         if (enemy3Q.length) {
             var e = enemy3Q.pop();
             e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
@@ -241,7 +241,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate enemy3");
         }
     }
-    exports.newEnemy3 = newEnemy3;
+    exports.enemy3 = enemy3;
     function createBackground() {
         // sprite defaults to layer 0
         return {
@@ -386,6 +386,20 @@ define("systems", ["require", "exports", "Sdx"], function (require, exports, sdx
     var enemyT1 = 2;
     var enemyT2 = 7;
     var enemyT3 = 13;
+    function inputSystem(game, entities) {
+        var player = entities.pool[0];
+        player.position.x = game.mouse_x;
+        player.position.y = game.mouse_y;
+        if (game.mouse_down || game.getKey(sdx.InputKeys.z)) {
+            timeToFire -= game.delta_time;
+            if (timeToFire < 0) {
+                timeToFire = fireRate;
+                entities.bullet(game, game.mouse_x + 27, game.mouse_y + 2);
+                entities.bullet(game, game.mouse_x - 27, game.mouse_y + 2);
+            }
+        }
+    }
+    exports.inputSystem = inputSystem;
     function physicsSystem(game, entities) {
         for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
             var e = _a[_i];
@@ -409,20 +423,6 @@ define("systems", ["require", "exports", "Sdx"], function (require, exports, sdx
         }
     }
     exports.physicsSystem = physicsSystem;
-    function inputSystem(game, entities) {
-        var player = entities.pool[0];
-        player.position.x = game.mouse_x;
-        player.position.y = game.mouse_y;
-        if (game.mouse_down || game.getKey(sdx.InputKeys.z)) {
-            timeToFire -= game.delta_time;
-            if (timeToFire < 0) {
-                timeToFire = fireRate;
-                entities.newBullet(game, game.mouse_x + 27, game.mouse_y + 2);
-                entities.newBullet(game, game.mouse_x - 27, game.mouse_y + 2);
-            }
-        }
-    }
-    exports.inputSystem = inputSystem;
     function expireSystem(game, entities) {
         for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
             var e = _a[_i];
@@ -479,13 +479,13 @@ define("systems", ["require", "exports", "Sdx"], function (require, exports, sdx
             if (d1 < 0) {
                 switch (enemy) {
                     case 1:
-                        entities.newEnemy1(game);
+                        entities.enemy1(game);
                         return 2;
                     case 2:
-                        entities.newEnemy2(game);
+                        entities.enemy2(game);
                         return 7;
                     case 3:
-                        entities.newEnemy3(game);
+                        entities.enemy3(game);
                         return 13;
                     default: throw new Error("WTF");
                 }
@@ -498,32 +498,6 @@ define("systems", ["require", "exports", "Sdx"], function (require, exports, sdx
         enemyT3 = spawn(enemyT3, 3);
     }
     exports.spawnSystem = spawnSystem;
-    function intersects(a, b) {
-        var r1 = a.bounds;
-        var r2 = b.bounds;
-        return ((r1.x < r2.x + r2.w) &&
-            (r1.x + r1.w > r2.x) &&
-            (r1.y < r2.y + r2.h) &&
-            (r1.y + r1.h > r2.y));
-    }
-    function handleCollision(game, enemy, bullet, entities) {
-        var x = bullet.position.x;
-        var y = bullet.position.y;
-        entities.newBang(game, x, y);
-        entities.deactivate(game, bullet);
-        for (var i = 0; i < 4; i++) {
-            entities.newParticle(game, x, y);
-        }
-        if (enemy.health) {
-            enemy.health.current -= 2;
-            if (enemy.health.current < 0) {
-                x = enemy.position.x;
-                y = enemy.position.y;
-                entities.deactivate(game, enemy);
-                entities.newExplosion(game, x, y);
-            }
-        }
-    }
     function collisionSystem(game, entities) {
         for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
             var e = _a[_i];
@@ -537,6 +511,32 @@ define("systems", ["require", "exports", "Sdx"], function (require, exports, sdx
         }
     }
     exports.collisionSystem = collisionSystem;
+    function intersects(a, b) {
+        var r1 = a.bounds;
+        var r2 = b.bounds;
+        return ((r1.x < r2.x + r2.w) &&
+            (r1.x + r1.w > r2.x) &&
+            (r1.y < r2.y + r2.h) &&
+            (r1.y + r1.h > r2.y));
+    }
+    function handleCollision(game, enemy, bullet, entities) {
+        var x = bullet.position.x;
+        var y = bullet.position.y;
+        entities.bang(game, x, y);
+        entities.deactivate(game, bullet);
+        for (var i = 0; i < 4; i++) {
+            entities.particle(game, x, y);
+        }
+        if (enemy.health) {
+            enemy.health.current -= 2;
+            if (enemy.health.current < 0) {
+                x = enemy.position.x;
+                y = enemy.position.y;
+                entities.deactivate(game, enemy);
+                entities.explosion(game, x, y);
+            }
+        }
+    }
 });
 define("game", ["require", "exports", "Sdx", "entities", "systems"], function (require, exports, sdx, entities, systems) {
     "use strict";

@@ -620,7 +620,7 @@ declare module 'Sdx' {
         act(delta: number):void
         fire(event: any):boolean
         notify(property_name: string):void
-        // notify(event: any, capture: boolean):boolean
+
         hit(x: number, y: number, touchable: boolean):any
         remove():boolean
         addListener(listener: any):boolean
