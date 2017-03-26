@@ -891,6 +891,8 @@ declare module 'Sdx' {
         getKey(code: number):number
         handleEvents():number
         draw():void
+        get_yield_for_events_ms():number
+        set_yield_for_events_ms(value: number):void
         get_profile():boolean
         set_profile(value: boolean):void
         get_mouse_down():boolean

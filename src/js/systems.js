@@ -6,7 +6,7 @@ import {Sdx} from 'Sdx'
 
 const fireRate = 0.1
 let timeToFire = 0
-const T1 = 2
+const T1 = 1
 const T2 = 5
 const T3 = 7
 let enemyT1 = T1
@@ -16,7 +16,7 @@ let enemyT3 = T3
 export function healthSystem(game, entities) {
     for (let e of entities.active) {
         if (e.active && e.health && e.text) {
-            let pct = e.health.current/e.health.maximum*100.0
+            let pct = Math.ceil(e.health.current/e.health.maximum*100.0)
             let str = "%3f%%".printf(pct)
             if (str !== e.text.text) {
                 e.text = sdx.createText(str, Sdx.app.font, sdx.graphics.Color.CHARTREUSE)

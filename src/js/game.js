@@ -1,4 +1,5 @@
 import * as sdx from 'Sdx'
+import {Sdx} from 'Sdx'
 
 import * as entities from 'entities'
 import * as systems from 'systems'
@@ -23,7 +24,6 @@ function main() {
             systems.physicsSystem(game, entities)
             systems.healthSystem(game, entities)
             systems.soundSystem(game, entities)
-            //print(sdx.Sdx.graphics.deltaTime)
             game.draw()
         }
     }

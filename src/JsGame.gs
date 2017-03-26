@@ -13,7 +13,7 @@ namespace sdx
 
     class JsGame : Object implements IApplication
 
-        const YieldForEventsMS: int = 1000
+        prop yield_for_events_ms: int = 1000
         prop profile: bool = false
         prop mouse_down: bool
         prop mouse_x: int = 0
@@ -214,7 +214,7 @@ namespace sdx
                 sprite.render(_renderer, sprite.x, sprite.y)
                 
             onetime = new list of Sprite           
-            if YieldForEventsMS > 0 do GLib.Thread.usleep(YieldForEventsMS) 
+            if yield_for_events_ms > 0 do GLib.Thread.usleep(yield_for_events_ms) 
             if show_fps
                 if fpsSprite != null do fpsSprite = null
                 fpsSprite = new Sprite.text("%2.2f".printf(Sdx.graphics.fps), font, sdx.graphics.Color.AntiqueWhite)

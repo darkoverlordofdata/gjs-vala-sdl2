@@ -43,10 +43,7 @@ Object.defineProperties(define, {
 Object.defineProperties(String.prototype, {
     printf: { value: imports.format.format }
 });
-/**
- * api fixups for gjs
- */
-define("game", ["require", "exports", "Sdx"], function (require, exports, sdx) {
+define("shim", ["require", "exports", "Sdx"], function (require, exports, sdx) {
     "use strict";
     Object.defineProperties(sdx, {
         createGame: { value: function (t, h, w, b) {
@@ -505,7 +502,7 @@ define("systems", ["require", "exports", "Sdx", "Sdx"], function (require, expor
     "use strict";
     var fireRate = 0.1;
     var timeToFire = 0;
-    var T1 = 2;
+    var T1 = 1;
     var T2 = 5;
     var T3 = 7;
     var enemyT1 = T1;
@@ -515,7 +512,7 @@ define("systems", ["require", "exports", "Sdx", "Sdx"], function (require, expor
         for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
             var e = _a[_i];
             if (e.active && e.health && e.text) {
-                var pct = e.health.current / e.health.maximum * 100.0;
+                var pct = Math.ceil(e.health.current / e.health.maximum * 100.0);
                 var str = "%3f%%".printf(pct);
                 if (str !== e.text.text) {
                     e.text = sdx.createText(str, Sdx_2.Sdx.app.font, sdx.graphics.Color.CHARTREUSE);
@@ -688,7 +685,7 @@ define("systems", ["require", "exports", "Sdx", "Sdx"], function (require, expor
         }
     }
 });
-define("game", ["require", "exports", "Sdx", "entities", "systems"], function (require, exports, sdx, entities, systems) {
+define("game", ["require", "exports", "Sdx", "Sdx", "entities", "systems"], function (require, exports, sdx, Sdx_3, entities, systems) {
     "use strict";
     function main() {
         var game = sdx.createGame("ShmupWarz", 640, 640, DATADIR);
@@ -709,7 +706,7 @@ define("game", ["require", "exports", "Sdx", "entities", "systems"], function (r
                 systems.physicsSystem(game, entities);
                 systems.healthSystem(game, entities);
                 systems.soundSystem(game, entities);
-                //print(sdx.Sdx.graphics.deltaTime)
+                print("%f - %f".printf(Sdx_3.Sdx.graphics.deltaTime, Sdx_3.Sdx.app.deltaTime));
                 game.draw();
             }
         }

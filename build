@@ -97,6 +97,7 @@ cat << EOF > ./tsconfig.json
     "src/js/sdx-0.1.d.ts",
     "src/js/gjs.d.ts",
     "src/js/gjs.js",
+    "src/js/shim.js",
     "src/js/global.js",
     "src/js/game.js"
   ]
