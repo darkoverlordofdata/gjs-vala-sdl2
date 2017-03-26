@@ -21,7 +21,7 @@ namespace sdx.scenes.scene2d
         childrenOnly
 
     const PI: double = 3.1415927
-    const degreesToRadians: double = PI / 180
+    const degreesToRadians: double = PI / 180.0
 
     class Actor : Object
         prop stage: Stage

@@ -2,36 +2,62 @@
  * Systems
  */
 import * as sdx from 'Sdx'
+import {Sdx} from 'Sdx'
 
 const fireRate = 0.1
 let timeToFire = 0
-let enemyT1 = 2
-let enemyT2 = 7
-let enemyT3 = 13
+const T1 = 2
+const T2 = 5
+const T3 = 7
+let enemyT1 = T1
+let enemyT2 = T2
+let enemyT3 = T3
 
+export function healthSystem(game, entities) {
+    for (let e of entities.active) {
+        if (e.active && e.health && e.text) {
+            let pct = e.health.current/e.health.maximum*100.0
+            let str = "%3f%%".printf(pct)
+            if (str !== e.text.text) {
+                e.text = sdx.createText(str, Sdx.app.font, sdx.graphics.Color.CHARTREUSE)
+            }
+            e.text.x = e.position.x
+            e.text.y = e.position.y
+            game.addOnce(e.text)
+        }
+    }    
+}
 export function inputSystem(game, entities) {
     const player = entities.pool[0]
-    player.position.x = game.mouse_x
-    player.position.y = game.mouse_y
-    if (game.mouse_down || game.getKey(sdx.InputKeys.z)) { /* fire system */
-        timeToFire -= game.delta_time
+    player.position.x = game.mouseX
+    player.position.y = game.mouseY
+    if (game.mouseDown || game.getKey(sdx.Input.Keys.z)) { /* fire system */
+        timeToFire -= game.deltaTime
         if (timeToFire < 0) {
             timeToFire = fireRate
-            entities.bullet(game, game.mouse_x+27, game.mouse_y+2)
-            entities.bullet(game, game.mouse_x-27, game.mouse_y+2)
+            entities.bullet(game, game.mouseX+27, game.mouseY+2)
+            entities.bullet(game, game.mouseX-27, game.mouseY+2)
         }
     }
+}
+
+export function soundSystem(game, entities) {
+    for (let e of entities.active) {
+        if (e.active && e.sound) {
+            e.sound.play(0)
+        }
+    }    
 }
 
 export function physicsSystem(game, entities) {
     for (let e of entities.active) {
         if (e.active) {
             if (e.velocity) {
-                e.position.x += e.velocity.x * game.delta_time
-                e.position.y += e.velocity.y * game.delta_time
+                e.position.x += e.velocity.x * game.deltaTime
+                e.position.y += e.velocity.y * game.deltaTime
             }
             if (e.bounds) {     // adjust bounds 'hit zone'
-                e.bounds.x = e.position.x - e.bounds.w/8
+                e.bounds.x = e.position.x - e.bounds.w/4
                 e.bounds.y = e.position.y - e.bounds.h/2
             }
             // update the sprite object
@@ -48,7 +74,7 @@ export function expireSystem(game, entities) {
     for (let e of entities.active) {
         if (e.player) continue
         if (e.active && e.expires) {
-            e.expires -= game.delta_time
+            e.expires -= game.deltaTime
             if (e.expires < 0) {
                 entities.deactivate(game, e)
             }
@@ -69,8 +95,8 @@ export function tweenSystem(game, entities) {
     for (let e of entities.active) {
         if (e.active && e.tween) {
             let tween = e.tween
-            let x = e.scale.x + (tween.speed * game.delta_time)
-            let y = e.scale.y + (tween.speed * game.delta_time)
+            let x = e.scale.x + (tween.speed * game.deltaTime)
+            let y = e.scale.y + (tween.speed * game.deltaTime)
             let active = e.tween.active
 
             if (x > tween.max) {
@@ -91,12 +117,12 @@ export function tweenSystem(game, entities) {
 
 export function spawnSystem(game, entities) {
     function spawn(t, enemy) {
-        const d1 = t-game.delta_time
+        const d1 = t-game.deltaTime
         if (d1<0) {
             switch(enemy) {
-                case 1: entities.enemy1(game); return 2
-                case 2: entities.enemy2(game); return 7
-                case 3: entities.enemy3(game); return 13
+                case 1: entities.enemy1(game); return T1
+                case 2: entities.enemy2(game); return T2
+                case 3: entities.enemy3(game); return T3
                 default: throw new Error("WTF")
             }
         } else return d1

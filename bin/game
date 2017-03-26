@@ -44,15 +44,115 @@ Object.defineProperties(String.prototype, {
     printf: { value: imports.format.format }
 });
 /**
+ * api fixups for gjs
+ */
+define("game", ["require", "exports", "Sdx"], function (require, exports, sdx) {
+    "use strict";
+    Object.defineProperties(sdx, {
+        createGame: { value: function (t, h, w, b) {
+                var g = sdx.createJsGame(t, h, w, b);
+                // fix some camel case property names
+                Object.defineProperties(g, {
+                    mouseX: { get: function () { return g.get_mouse_x(); } },
+                    mouseY: { get: function () { return g.get_mouse_y(); } },
+                    mouseDown: { get: function () { return g.get_mouse_down(); } },
+                    showFps: { get: function () { return g.get_show_fps(); } },
+                    deltaTime: { get: function () { return g.get_delta_time(); } }
+                });
+                Object.defineProperties(sdx.Sdx.graphics, {
+                    deltaTime: { get: function () { return sdx.Sdx.graphics.get_deltaTime(); } },
+                    pixelFactor: { get: function () { return sdx.Sdx.graphics.get_pixelFactor(); } }
+                });
+                Object.defineProperties(sdx.Sdx.files, {
+                    isResource: { get: function () { return sdx.Sdx.files.get_isResource(); } },
+                    resourcePath: { get: function () { return sdx.Sdx.files.get_resourcePath(); } }
+                });
+                return g;
+            } }
+    });
+    // fix some static property names
+    Object.defineProperties(sdx.Sdx, {
+        app: { get: function () { return sdx.Sdx.get_app(); } },
+        graphics: { get: function () { return sdx.Sdx.get_graphics(); } },
+        audio: { get: function () { return sdx.Sdx.get_audio(); } },
+        input: { get: function () { return sdx.Sdx.get_input(); } },
+        files: { get: function () { return sdx.Sdx.get_files(); } }
+    });
+    // fix enums
+    Object.defineProperties(sdx, { graphics: { value: {} } });
+    Object.defineProperties(sdx.graphics, { Color: { value: {} } });
+    Object.defineProperties(sdx.graphics.Color, {
+        CLEAR: { get: function () { return sdx.graphicsColor.get_CLEAR(); } },
+        BLACK: { get: function () { return sdx.graphicsColor.get_BLACK(); } },
+        WHITE: { get: function () { return sdx.graphicsColor.get_WHITE(); } },
+        LIGHT_GRAY: { get: function () { return sdx.graphicsColor.get_LIGHT_GRAY(); } },
+        GRAY: { get: function () { return sdx.graphicsColor.get_GRAY(); } },
+        DARK_GRAY: { get: function () { return sdx.graphicsColor.get_DARK_GRAY(); } },
+        BLUE: { get: function () { return sdx.graphicsColor.get_BLUE(); } },
+        NAVY: { get: function () { return sdx.graphicsColor.get_NAVY(); } },
+        ROYAL: { get: function () { return sdx.graphicsColor.get_ROYAL(); } },
+        SLATE: { get: function () { return sdx.graphicsColor.get_SLATE(); } },
+        SKY: { get: function () { return sdx.graphicsColor.get_SKY(); } },
+        CYAN: { get: function () { return sdx.graphicsColor.get_CYAN(); } },
+        TEAL: { get: function () { return sdx.graphicsColor.get_TEAL(); } },
+        GREEN: { get: function () { return sdx.graphicsColor.get_GREEN(); } },
+        CHARTREUSE: { get: function () { return sdx.graphicsColor.get_CHARTREUSE(); } },
+        LIME: { get: function () { return sdx.graphicsColor.get_LIME(); } },
+        FOREST: { get: function () { return sdx.graphicsColor.get_FOREST(); } },
+        OLIVE: { get: function () { return sdx.graphicsColor.get_OLIVE(); } },
+        YELLOW: { get: function () { return sdx.graphicsColor.get_YELLOW(); } },
+        GOLD: { get: function () { return sdx.graphicsColor.get_GOLD(); } },
+        GOLDENROD: { get: function () { return sdx.graphicsColor.get_GOLDENROD(); } },
+        ORANGE: { get: function () { return sdx.graphicsColor.get_ORANGE(); } },
+        BROWN: { get: function () { return sdx.graphicsColor.get_BROWN(); } },
+        TAN: { get: function () { return sdx.graphicsColor.get_TAN(); } },
+        FIREBRICK: { get: function () { return sdx.graphicsColor.get_FIREBRICK(); } },
+        RED: { get: function () { return sdx.graphicsColor.get_RED(); } },
+        SCARLET: { get: function () { return sdx.graphicsColor.get_SCARLET(); } },
+        SALMON: { get: function () { return sdx.graphicsColor.get_SALMON(); } },
+        PINK: { get: function () { return sdx.graphicsColor.get_PINK(); } },
+        MAGENTA: { get: function () { return sdx.graphicsColor.get_MAGENTA(); } },
+        PURPLE: { get: function () { return sdx.graphicsColor.get_PURPLE(); } },
+        VIOLET: { get: function () { return sdx.graphicsColor.get_VIOLET(); } },
+        MAROON: { get: function () { return sdx.graphicsColor.get_MAROON(); } }
+    });
+    Object.defineProperties(sdx.Input, {
+        Keys: { value: {
+                Esc: 27,
+                a: 97,
+                b: 98,
+                c: 99,
+                d: 100,
+                e: 101,
+                f: 102,
+                g: 103,
+                h: 104,
+                i: 105,
+                j: 106,
+                k: 107,
+                l: 108,
+                m: 109,
+                n: 110,
+                o: 111,
+                p: 112,
+                q: 113,
+                r: 114,
+                s: 115,
+                t: 116,
+                u: 117,
+                v: 118,
+                w: 119,
+                x: 120,
+                y: 121,
+                z: 122
+            } }
+    });
+});
+/**
  * Global constants
  */
 var DATADIR = '/home/bruce/gjs/sdxjs/data';
-define("keys", ["require", "exports"], function (require, exports) {
-    "use strict";
-    exports.KEY_z = 122;
-    exports.KEY_ESC = 27;
-});
-define("entities", ["require", "exports", "Sdx"], function (require, exports, sdx) {
+define("entities", ["require", "exports", "Sdx", "Sdx"], function (require, exports, sdx, Sdx_1) {
     "use strict";
     var Tau = 6.28318;
     var BULLETS = 20;
@@ -73,17 +173,22 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
     exports.pool = new Array(2 + BULLETS + ENEMIES + EXPLOSIONS + BANGS + PARTICLES);
     exports.active = [];
     var uniqueId = 0;
+    /**
+     * Array::remove
+     *
+     * @param entity
+     * @returns the removed entity
+     */
     Array.prototype.remove = function (e) {
         var i = this.indexOf(e);
         if (i > -1) {
             if (this[i].id !== e.id)
                 throw new Error("Invalid remove id");
-            return this.splice(i, 1);
+            return this.splice(i, 1)[0];
         }
         else {
             print(JSON.stringify(e, null, 2));
             throw new Error("Unable to remove " + e.id);
-            return null;
         }
     };
     function createPool(game) {
@@ -112,7 +217,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
     function deactivate(game, e) {
         e.active = false;
         var z = exports.active.remove(e);
-        if (z[0].id !== e.id) {
+        if (z.id !== e.id) {
             throw new Error("removed wrong entity");
         }
         game.removeSprite(e.sprite);
@@ -138,7 +243,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             }
     }
     exports.deactivate = deactivate;
-    function newBang(game, x, y) {
+    function bang(game, x, y) {
         if (bangQ.length) {
             var e = bangQ.pop();
             e.active = true;
@@ -155,8 +260,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate bang");
         }
     }
-    exports.newBang = newBang;
-    function newParticle(game, x, y) {
+    exports.bang = bang;
+    function particle(game, x, y) {
         if (particleQ.length) {
             var e = particleQ.pop();
             e.active = true;
@@ -170,8 +275,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate particle");
         }
     }
-    exports.newParticle = newParticle;
-    function newExplosion(game, x, y) {
+    exports.particle = particle;
+    function explosion(game, x, y) {
         if (explosionQ.length) {
             var e = explosionQ.pop();
             e.active = true;
@@ -188,8 +293,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate explosion");
         }
     }
-    exports.newExplosion = newExplosion;
-    function newBullet(game, x, y) {
+    exports.explosion = explosion;
+    function bullet(game, x, y) {
         if (bulletQ.length) {
             var e = bulletQ.pop();
             e.active = true;
@@ -202,8 +307,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate bullet");
         }
     }
-    exports.newBullet = newBullet;
-    function newEnemy1(game) {
+    exports.bullet = bullet;
+    function enemy1(game) {
         if (enemy1Q.length) {
             var e = enemy1Q.pop();
             e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
@@ -217,8 +322,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate enemy1");
         }
     }
-    exports.newEnemy1 = newEnemy1;
-    function newEnemy2(game) {
+    exports.enemy1 = enemy1;
+    function enemy2(game) {
         if (enemy2Q.length) {
             var e = enemy2Q.pop();
             e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
@@ -232,8 +337,8 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate enemy2");
         }
     }
-    exports.newEnemy2 = newEnemy2;
-    function newEnemy3(game) {
+    exports.enemy2 = enemy2;
+    function enemy3(game) {
         if (enemy3Q.length) {
             var e = enemy3Q.pop();
             e.position.x = Math.random() * (game.width - e.bounds.w) + e.bounds.w / 2;
@@ -247,16 +352,18 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             throw new Error("Unable to allocate enemy3");
         }
     }
-    exports.newEnemy3 = newEnemy3;
+    exports.enemy3 = enemy3;
     function createBackground() {
         // sprite defaults to layer 0
+        var sprite = sdx.createSprite('images/BackdropBlackLittleSparkBlack.png');
+        sprite.centered = false;
         return {
             id: uniqueId++,
             active: true,
             scale: { x: 3, y: 3 },
             position: { x: 0, y: 0 },
             velocity: { x: 0, y: 0 },
-            sprite: sdx.createSprite('images/BackdropBlackLittleSparkBlack.png')
+            sprite: sprite
         };
     }
     function createPlayer() {
@@ -283,10 +390,12 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             position: { x: 0, y: 0 },
             velocity: { x: 0, y: -800 },
             tint: { r: 0xd2, g: 0xfa, b: 0, a: 0xff },
+            sound: sdx.createSound("sounds/pew.wav"),
             sprite: sprite
         };
     }
     function createEnemy1() {
+        var text = sdx.createText("100%", Sdx_1.Sdx.app.font, sdx.graphics.Color.CHARTREUSE);
         var sprite = sdx.createSprite('images/enemy1.png');
         sprite.layer = 5;
         return {
@@ -298,10 +407,12 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             position: { x: 0, y: 0 },
             velocity: { x: 0, y: 40 },
             health: { current: 10, maximum: 10 },
+            text: text,
             sprite: sprite
         };
     }
     function createEnemy2() {
+        var text = sdx.createText("100%", Sdx_1.Sdx.app.font, sdx.graphics.Color.CHARTREUSE);
         var sprite = sdx.createSprite('images/enemy2.png');
         sprite.layer = 6;
         return {
@@ -313,10 +424,12 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             position: { x: 0, y: 0 },
             velocity: { x: 0, y: 30 },
             health: { current: 20, maximum: 20 },
+            text: text,
             sprite: sprite
         };
     }
     function createEnemy3() {
+        var text = sdx.createText("100%", Sdx_1.Sdx.app.font, sdx.graphics.Color.CHARTREUSE);
         var sprite = sdx.createSprite('images/enemy3.png');
         sprite.layer = 7;
         return {
@@ -328,6 +441,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             position: { x: 0, y: 0 },
             velocity: { x: 0, y: 20 },
             health: { current: 60, maximum: 60 },
+            text: text,
             sprite: sprite
         };
     }
@@ -343,6 +457,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             scale: { x: 0.5, y: 0.5 },
             tween: { min: 0.5 / 100, max: 0.5, speed: -3, repeat: false, active: true },
             tint: { r: 0xd2, g: 0xfa, b: 0xd2, a: 0xfa },
+            sound: sdx.createSound("asplode/pew.wav"),
             expires: 0.2,
             sprite: sprite
         };
@@ -359,6 +474,7 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
             scale: { x: 0.2, y: 0.2 },
             tween: { min: 0.2 / 100, max: 0.2, speed: -3, repeat: false, active: true },
             tint: { r: 0xd2, g: 0xfa, b: 0xd2, a: 0xfa },
+            sound: sdx.createSound("smallasplode/pew.wav"),
             expires: 0.2,
             sprite: sprite
         };
@@ -385,23 +501,65 @@ define("entities", ["require", "exports", "Sdx"], function (require, exports, sd
         };
     }
 });
-define("systems", ["require", "exports", "keys"], function (require, exports, keys) {
+define("systems", ["require", "exports", "Sdx", "Sdx"], function (require, exports, sdx, Sdx_2) {
     "use strict";
     var fireRate = 0.1;
     var timeToFire = 0;
-    var enemyT1 = 2;
-    var enemyT2 = 7;
-    var enemyT3 = 13;
+    var T1 = 2;
+    var T2 = 5;
+    var T3 = 7;
+    var enemyT1 = T1;
+    var enemyT2 = T2;
+    var enemyT3 = T3;
+    function healthSystem(game, entities) {
+        for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
+            var e = _a[_i];
+            if (e.active && e.health && e.text) {
+                var pct = e.health.current / e.health.maximum * 100.0;
+                var str = "%3f%%".printf(pct);
+                if (str !== e.text.text) {
+                    e.text = sdx.createText(str, Sdx_2.Sdx.app.font, sdx.graphics.Color.CHARTREUSE);
+                }
+                e.text.x = e.position.x;
+                e.text.y = e.position.y;
+                game.addOnce(e.text);
+            }
+        }
+    }
+    exports.healthSystem = healthSystem;
+    function inputSystem(game, entities) {
+        var player = entities.pool[0];
+        player.position.x = game.mouseX;
+        player.position.y = game.mouseY;
+        if (game.mouseDown || game.getKey(sdx.Input.Keys.z)) {
+            timeToFire -= game.deltaTime;
+            if (timeToFire < 0) {
+                timeToFire = fireRate;
+                entities.bullet(game, game.mouseX + 27, game.mouseY + 2);
+                entities.bullet(game, game.mouseX - 27, game.mouseY + 2);
+            }
+        }
+    }
+    exports.inputSystem = inputSystem;
+    function soundSystem(game, entities) {
+        for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
+            var e = _a[_i];
+            if (e.active && e.sound) {
+                e.sound.play(0);
+            }
+        }
+    }
+    exports.soundSystem = soundSystem;
     function physicsSystem(game, entities) {
         for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
             var e = _a[_i];
             if (e.active) {
                 if (e.velocity) {
-                    e.position.x += e.velocity.x * game.delta_time;
-                    e.position.y += e.velocity.y * game.delta_time;
+                    e.position.x += e.velocity.x * game.deltaTime;
+                    e.position.y += e.velocity.y * game.deltaTime;
                 }
                 if (e.bounds) {
-                    e.bounds.x = e.position.x - e.bounds.w / 8;
+                    e.bounds.x = e.position.x - e.bounds.w / 4;
                     e.bounds.y = e.position.y - e.bounds.h / 2;
                 }
                 // update the sprite object
@@ -415,27 +573,13 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
         }
     }
     exports.physicsSystem = physicsSystem;
-    function inputSystem(game, entities) {
-        var player = entities.pool[0];
-        player.position.x = game.mouse_x;
-        player.position.y = game.mouse_y;
-        if (game.mouse_down || game.getKey(keys.KEY_z)) {
-            timeToFire -= game.delta_time;
-            if (timeToFire < 0) {
-                timeToFire = fireRate;
-                entities.newBullet(game, game.mouse_x + 27, game.mouse_y + 2);
-                entities.newBullet(game, game.mouse_x - 27, game.mouse_y + 2);
-            }
-        }
-    }
-    exports.inputSystem = inputSystem;
     function expireSystem(game, entities) {
         for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
             var e = _a[_i];
             if (e.player)
                 continue;
             if (e.active && e.expires) {
-                e.expires -= game.delta_time;
+                e.expires -= game.deltaTime;
                 if (e.expires < 0) {
                     entities.deactivate(game, e);
                 }
@@ -459,8 +603,8 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
             var e = _a[_i];
             if (e.active && e.tween) {
                 var tween = e.tween;
-                var x = e.scale.x + (tween.speed * game.delta_time);
-                var y = e.scale.y + (tween.speed * game.delta_time);
+                var x = e.scale.x + (tween.speed * game.deltaTime);
+                var y = e.scale.y + (tween.speed * game.deltaTime);
                 var active = e.tween.active;
                 if (x > tween.max) {
                     x = tween.max;
@@ -481,18 +625,18 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
     exports.tweenSystem = tweenSystem;
     function spawnSystem(game, entities) {
         function spawn(t, enemy) {
-            var d1 = t - game.delta_time;
+            var d1 = t - game.deltaTime;
             if (d1 < 0) {
                 switch (enemy) {
                     case 1:
-                        entities.newEnemy1(game);
-                        return 2;
+                        entities.enemy1(game);
+                        return T1;
                     case 2:
-                        entities.newEnemy2(game);
-                        return 7;
+                        entities.enemy2(game);
+                        return T2;
                     case 3:
-                        entities.newEnemy3(game);
-                        return 13;
+                        entities.enemy3(game);
+                        return T3;
                     default: throw new Error("WTF");
                 }
             }
@@ -504,32 +648,6 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
         enemyT3 = spawn(enemyT3, 3);
     }
     exports.spawnSystem = spawnSystem;
-    function intersects(a, b) {
-        var r1 = a.bounds;
-        var r2 = b.bounds;
-        return ((r1.x < r2.x + r2.w) &&
-            (r1.x + r1.w > r2.x) &&
-            (r1.y < r2.y + r2.h) &&
-            (r1.y + r1.h > r2.y));
-    }
-    function handleCollision(game, enemy, bullet, entities) {
-        var x = bullet.position.x;
-        var y = bullet.position.y;
-        entities.newBang(game, x, y);
-        entities.deactivate(game, bullet);
-        for (var i = 0; i < 4; i++) {
-            entities.newParticle(game, x, y);
-        }
-        if (enemy.health) {
-            enemy.health.current -= 2;
-            if (enemy.health.current < 0) {
-                x = enemy.position.x;
-                y = enemy.position.y;
-                entities.deactivate(game, enemy);
-                entities.newExplosion(game, x, y);
-            }
-        }
-    }
     function collisionSystem(game, entities) {
         for (var _i = 0, _a = entities.active; _i < _a.length; _i++) {
             var e = _a[_i];
@@ -543,8 +661,34 @@ define("systems", ["require", "exports", "keys"], function (require, exports, ke
         }
     }
     exports.collisionSystem = collisionSystem;
+    function intersects(a, b) {
+        var r1 = a.bounds;
+        var r2 = b.bounds;
+        return ((r1.x < r2.x + r2.w) &&
+            (r1.x + r1.w > r2.x) &&
+            (r1.y < r2.y + r2.h) &&
+            (r1.y + r1.h > r2.y));
+    }
+    function handleCollision(game, enemy, bullet, entities) {
+        var x = bullet.position.x;
+        var y = bullet.position.y;
+        entities.bang(game, x, y);
+        entities.deactivate(game, bullet);
+        for (var i = 0; i < 4; i++) {
+            entities.particle(game, x, y);
+        }
+        if (enemy.health) {
+            enemy.health.current -= 2;
+            if (enemy.health.current < 0) {
+                x = enemy.position.x;
+                y = enemy.position.y;
+                entities.deactivate(game, enemy);
+                entities.explosion(game, x, y);
+            }
+        }
+    }
 });
-define("game", ["require", "exports", "Sdx", "keys", "entities", "systems"], function (require, exports, sdx, keys, entities, systems) {
+define("game", ["require", "exports", "Sdx", "entities", "systems"], function (require, exports, sdx, entities, systems) {
     "use strict";
     function main() {
         var game = sdx.createGame("ShmupWarz", 640, 640, DATADIR);
@@ -553,7 +697,7 @@ define("game", ["require", "exports", "Sdx", "keys", "entities", "systems"], fun
         game.start();
         while (game.running) {
             game.handleEvents();
-            if (game.getKey(keys.KEY_ESC))
+            if (game.getKey(sdx.Input.Keys.Esc))
                 break;
             else {
                 systems.collisionSystem(game, entities);
@@ -563,6 +707,9 @@ define("game", ["require", "exports", "Sdx", "keys", "entities", "systems"], fun
                 systems.tweenSystem(game, entities);
                 systems.inputSystem(game, entities);
                 systems.physicsSystem(game, entities);
+                systems.healthSystem(game, entities);
+                systems.soundSystem(game, entities);
+                //print(sdx.Sdx.graphics.deltaTime)
                 game.draw();
             }
         }

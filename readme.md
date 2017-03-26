@@ -22,7 +22,6 @@ generates:
 * sdx-0.1.typelib
 * sdx-0.1.d.ts
 
-
 ## example
 
 ```javascript

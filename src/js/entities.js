@@ -2,6 +2,7 @@
  * Entity Factory
  */
 import * as sdx from 'Sdx'
+import {Sdx} from 'Sdx'
 
 const Tau = 6.28318
 const BULLETS = 20
@@ -23,12 +24,17 @@ export const pool = new Array(2+BULLETS+ENEMIES+EXPLOSIONS+BANGS+PARTICLES)
 export const active = []
 
 let uniqueId = 0
-
+/**
+ * Array::remove
+ * 
+ * @param entity
+ * @returns the removed entity
+ */
 Array.prototype.remove = function(e) {
     let i = this.indexOf(e)
     if (i > -1) {
         if (this[i].id !== e.id) throw new Error("Invalid remove id")
-        return this.splice(i,1)
+        return this.splice(i,1)[0]
     } else {
         print(JSON.stringify(e,null, 2))
         throw new Error("Unable to remove "+e.id)
@@ -55,7 +61,7 @@ export function createPool(game) {
 export function deactivate(game, e) {
     e.active = false
     let z = active.remove(e)
-    if (z[0].id !== e.id) {
+    if (z.id !== e.id) {
         throw new Error("removed wrong entity")
     }
     game.removeSprite(e.sprite)
@@ -68,7 +74,6 @@ export function deactivate(game, e) {
         case 2: enemy2Q.push(e); break
         case 3: enemy3Q.push(e); break
     }
-    
 }
 
 export function bang(game, x, y) {
@@ -100,7 +105,6 @@ export function particle(game, x, y) {
     } else {
         throw new Error("Unable to allocate particle")
     }
-    
 }
 
 export function explosion(game, x, y) {
@@ -177,13 +181,15 @@ export function enemy3(game) {
 
 function createBackground() {
     // sprite defaults to layer 0
+    const sprite = sdx.createSprite('images/BackdropBlackLittleSparkBlack.png')
+    sprite.centered = false
     return {
         id: uniqueId++,
         active: true,
         scale: {x: 3, y: 3},
         position: {x: 0, y: 0},
         velocity: {x: 0, y: 0},
-        sprite: sdx.createSprite('images/BackdropBlackLittleSparkBlack.png')        
+        sprite: sprite        
     }
 }
 
@@ -212,11 +218,13 @@ function createBullet() {
         position: {x: 0, y: 0},
         velocity: {x: 0, y: -800},
         tint: {r:0xd2, g:0xfa, b:0, a:0xff},
+        sound: sdx.createSound("sounds/pew.wav"),
         sprite: sprite
     }
 }
 
 function createEnemy1() {
+    const text = sdx.createText("100%", Sdx.app.font, sdx.graphics.Color.CHARTREUSE)
     const sprite = sdx.createSprite('images/enemy1.png')
     sprite.layer = 5
     return {
@@ -228,10 +236,13 @@ function createEnemy1() {
         position: {x: 0, y: 0},
         velocity: {x: 0, y: 40},
         health: {current: 10, maximum: 10},
+        text: text,
         sprite: sprite
     }
 }
+
 function createEnemy2() {
+    const text = sdx.createText("100%", Sdx.app.font, sdx.graphics.Color.CHARTREUSE)
     const sprite = sdx.createSprite('images/enemy2.png')
     sprite.layer = 6
     return {
@@ -243,10 +254,13 @@ function createEnemy2() {
         position: {x: 0, y: 0},
         velocity: {x: 0, y: 30},
         health: {current: 20, maximum: 20},
+        text: text,
         sprite: sprite
     }
 }
+
 function createEnemy3() {
+    const text = sdx.createText("100%", Sdx.app.font, sdx.graphics.Color.CHARTREUSE)
     const sprite = sdx.createSprite('images/enemy3.png')
     sprite.layer = 7
     return {
@@ -258,6 +272,7 @@ function createEnemy3() {
         position: {x: 0, y: 0},
         velocity: {x: 0, y: 20},
         health: {current: 60, maximum: 60},
+        text: text,
         sprite: sprite
     }
 }
@@ -274,6 +289,7 @@ function createExplosion() {
         scale: {x: 0.5, y: 0.5},
         tween: {min: 0.5/100, max: 0.5, speed:-3, repeat:false, active:true},
         tint: {r:0xd2, g:0xfa, b:0xd2, a:0xfa},
+        sound: sdx.createSound("asplode/pew.wav"),
         expires: 0.2,
         sprite: sprite
     }
@@ -291,6 +307,7 @@ function createBang() {
         scale: {x: 0.2, y: 0.2},
         tween: {min: 0.2/100, max: 0.2, speed:-3, repeat:false, active:true},
         tint: {r:0xd2, g:0xfa, b:0xd2, a:0xfa},
+        sound: sdx.createSound("smallasplode/pew.wav"),
         expires: 0.2,
         sprite: sprite
     }

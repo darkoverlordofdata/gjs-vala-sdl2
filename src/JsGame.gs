@@ -1,3 +1,8 @@
+/**
+ * JsGame
+ *
+ * Basic game object for javascript
+ */
 [indent=4]
 
 uses SDL
@@ -9,7 +14,7 @@ namespace sdx
     class JsGame : Object implements IApplication
 
         const YieldForEventsMS: int = 1000
-        prop profile: bool = true
+        prop profile: bool = false
         prop mouse_down: bool
         prop mouse_x: int = 0
         prop mouse_y: int = 0
@@ -21,6 +26,7 @@ namespace sdx
         prop delta_time: double
         prop width: int = 800
         prop height: int = 640
+        prop font: Font
         prop renderer : unowned Renderer
             get
                 return _renderer
@@ -31,7 +37,6 @@ namespace sdx
         evt : private Event
         frames: int
         fpsSprite: private Sprite
-        font: Font
         scale: double = 1.0
         pixelFactor: double = 1.0
         defaultFont:string = "fonts/OpenDyslexic-Bold.otf"
@@ -59,6 +64,12 @@ namespace sdx
             this.base = base
             initialize()
 
+        /**
+         * addSprite
+         * @param sprite to add
+         *
+         * Insert a sprite in layer order
+         */
         def addSprite(sprite:Object)
             var ordinal = ((Sprite)sprite).layer
             if sprites.size == 0
@@ -74,12 +85,22 @@ namespace sdx
                 sprites.add((Sprite)sprite)
 
 
+        def addOnce(sprite:Object)
+            onetime.add((Sprite)sprite)
+
+        /**
+         * removeSprite
+         * @param sprite to remove
+         */
         def removeSprite(sprite:Object)
             sprites.remove((Sprite)sprite)
 
         def setApplicationListener(listener: ApplicationListener)
             app = listener
 
+        /**
+         * initialize SDL
+         */
         def initialize()
             sdlFailIf(SDL.init(SDL.InitFlag.VIDEO | SDL.InitFlag.TIMER | SDL.InitFlag.EVENTS) < 0, 
                 "SDL could not initialize! SDL Error: %s")
@@ -115,13 +136,28 @@ namespace sdx
             keys = new array of uint8[255]
             print "Game Initialized "
 
+        /**
+         * start
+         */
         def start()
             running = true
             lastTime = (double)GLib.get_real_time()/1000000.0        
                 
-        def getKey(i:int):int
-            return keys[i]
+        /**
+         * getKey
+         *
+         * @param code of key (ascii)
+         * @return 1 - pressed | 0 - not pressed
+         */
+        def getKey(code:int):int
+            return keys[code]
 
+        /**
+         * handleEvents
+         *
+         * collect the event information for this frame
+         * also update time info
+         */
         def handleEvents():int
 
             while Event.poll(out evt) != 0
@@ -148,6 +184,12 @@ namespace sdx
             
             return evt.type
 
+        /**
+         * draw
+         *
+         * draw the frame
+         * do profiling
+         */
         def draw()
             if profile
                 t2 = (double)GLib.get_real_time()/1000000.0
@@ -159,6 +201,7 @@ namespace sdx
                     t = t / 1000.0
                     print "%f", t
                     t = 0
+                    
             renderer.set_draw_color(0x0, 0x0, 0x0, 0x0)
             renderer.clear()
 
@@ -172,6 +215,10 @@ namespace sdx
                 
             onetime = new list of Sprite           
             if YieldForEventsMS > 0 do GLib.Thread.usleep(YieldForEventsMS) 
+            if show_fps
+                if fpsSprite != null do fpsSprite = null
+                fpsSprite = new Sprite.text("%2.2f".printf(Sdx.graphics.fps), font, sdx.graphics.Color.AntiqueWhite)
+                fpsSprite.centered = false
             renderer.present()
 
 

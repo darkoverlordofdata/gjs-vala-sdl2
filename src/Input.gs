@@ -9,20 +9,18 @@ namespace sdx
 
     class Input : Object
 
-
         prop readonly keys : array of uint8 = new array of uint8[255]
         processor: private InputProcessor
         evt : private SDL.Event
 
-
-        enum static Buttons
+        enum Buttons
             LEFT
             RIGHT
             MIDDLE
             BACK
             FORWARD
 
-        enum static Keys // Map SDL definitions
+        enum Keys // Map SDL definitions
             Esc = SDL.Input.Keycode.ESCAPE
             a = SDL.Input.Keycode.a
             b = SDL.Input.Keycode.b
@@ -50,6 +48,8 @@ namespace sdx
             x = SDL.Input.Keycode.x
             y = SDL.Input.Keycode.y
             z = SDL.Input.Keycode.z
+
+
 
         def setInputProcessor(processor: InputProcessor)
             this.processor = processor

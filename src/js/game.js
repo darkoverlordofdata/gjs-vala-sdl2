@@ -1,17 +1,18 @@
 import * as sdx from 'Sdx'
+
 import * as entities from 'entities'
 import * as systems from 'systems'
 
 function main() {
 
     const game = sdx.createGame("ShmupWarz", 640, 640, DATADIR) 
+
     entities.createPool(game)
     game.profile = true
     game.start()
     while(game.running) {
         game.handleEvents()
-        if (game.getKey(sdx.InputKeys.ESC)) break
-        // if (game.getKey(keys.KEY_ESC)) break
+        if (game.getKey(sdx.Input.Keys.Esc)) break
         else {
             systems.collisionSystem(game, entities)
             systems.expireSystem(game, entities)
@@ -20,6 +21,9 @@ function main() {
             systems.tweenSystem(game, entities)
             systems.inputSystem(game, entities)
             systems.physicsSystem(game, entities)
+            systems.healthSystem(game, entities)
+            systems.soundSystem(game, entities)
+            //print(sdx.Sdx.graphics.deltaTime)
             game.draw()
         }
     }

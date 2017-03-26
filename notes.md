@@ -1,37 +1,48 @@
 
 ## notes
 
-#### properties with upper case are imported wierd.
+## api
 
-    prop mouseX
+hierarchical frameworks like sdx are flatten and namemangled by vala, and become
+very cumbersome to use. So I'm using some top level functions to interface
+javascript to the framework.
 
-can only be accessed as get_mouseX()
+Default arguments are lost, and must be supplied by javascript
 
-or I can define it as mousex or mouse_x. Wtf Gnome?
+Camel case properties don't work. Properties must be snake case for script access.
 
-#### modules are broken
-If I import a constant from another gjs module, it throws "can't convert to an integer". Wtf Gnome?
-I'll use es6 modules, and transpile backport to es5.
+Enums and constants can't be calulated, can't have lower case. Can't be nested.
+So I need to redefine for javascript.
 
 
 ## performance
 
 preliminary profiling looks pretty good, 
-using the same functional ecs style, I get performance similar to fsharp and scala-native.
 
-0.001651
-0.001902
-0.001992
+    0.001322
+    0.001774
+    0.001792
+    0.001430
+    0.001758
+    0.001537
 
-0.002080
-0.002304
-0.002322
+compared to:
 
-fsharp          0.001651
-scala-native    0.001812
-ooc             0.002586
-nim             0.003331	
-vala	        0.003586	
-scala-jvm       0.008185	
+    gjs-vala        0.001602
+    fsharp          0.001651
+    scala-native    0.001812
+    ooc             0.002586
+    nim             0.003331	
+    vala	        0.003586	
+    scala-jvm       0.008185	
 
 
+## why?
+
+Why is it faster than a pure vala solution?
+
+* Game logic is pojs, which is I assume less overhead than GObject
+* SpiderMonkey is a Mozilla flagship product. I assume it's better at optimization than valac.
+* JS code is much more simple. Less code runs faster is especially true for JS.
+
+It allows me to dramatically increase the activity level of the game - this is a game changer.
