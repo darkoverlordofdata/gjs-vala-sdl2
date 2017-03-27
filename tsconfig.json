@@ -7,12 +7,16 @@
     "outFile": "bin/game"
   },
   "files": [
+    "node_modules/entitas-cli/build/entitas.d.ts",
     "src/js/gobject-2.0.d.ts",
-    "src/js/sdx-0.1.d.ts",
+    "src/js/sdx.d.ts",
     "src/js/gjs.d.ts",
     "src/js/gjs.js",
-    "src/js/shim.js",
     "src/js/global.js",
-    "src/js/game.js"
+    "src/js/entitas.js",
+    "src/js/generatedComponents.ts",
+    "src/js/generatedExtensions.js",
+    "src/js/sdx.shim.js",
+    "src/js/game.ts"
   ]
 }

@@ -6,38 +6,33 @@ import {Sdx} from 'Sdx'
 
 const Tau = 6.28318
 const BULLETS = 20
-const ENEMY1 = 9
+const ENEMY1 = 18
 const ENEMY2 = 7
 const ENEMY3 = 5
 const ENEMIES = ENEMY1+ENEMY2+ENEMY3
 const EXPLOSIONS = 8
 const BANGS = 16
-const PARTICLES = 40
-const bulletQ = []
-const particleQ = []
-const explosionQ = []
+const PARTICLES = 80
 const bangQ = []
 const enemy1Q = []
 const enemy2Q = []
 const enemy3Q = []
-export const pool = new Array(2+BULLETS+ENEMIES+EXPLOSIONS+BANGS+PARTICLES)
+const bulletQ = []
+const particleQ = []
+const explosionQ = []
 export const active = []
+export const pool = new Array(2+BULLETS+ENEMIES+EXPLOSIONS+BANGS+PARTICLES)
 
 let uniqueId = 0
-/**
- * Array::remove
- * 
- * @param entity
- * @returns the removed entity
- */
-Array.prototype.remove = function(e) {
-    let i = this.indexOf(e)
+
+function removeEntity(a, e) {
+    let i = a.indexOf(e)
     if (i > -1) {
-        if (this[i].id !== e.id) throw new Error("Invalid remove id")
-        return this.splice(i,1)[0]
-    } else {
-        print(JSON.stringify(e,null, 2))
-        throw new Error("Unable to remove "+e.id)
+        if (a[i].id !== e.id) throw new Error("Invalid remove id")
+        return a.splice(i,1)[0]
+    // } else {
+        //print(JSON.stringify(e,null, 2))
+        //throw new Error("Unable to remove "+e.id)
     }
 }
 
@@ -59,8 +54,20 @@ export function createPool(game) {
 
 
 export function deactivate(game, e) {
+    if (!e.active) {
+        print("already deactivated")
+        return
+    }
     e.active = false
-    let z = active.remove(e)
+    let z = removeEntity(active, e)
+    // let z = active.remove(e)
+    if (!z) {
+        print("z undefined")
+        if (!e.active) {
+            print("and already deactivated")
+        }
+        return
+    }
     if (z.id !== e.id) {
         throw new Error("removed wrong entity")
     }
@@ -99,7 +106,7 @@ export function particle(game, x, y) {
         e.active = true
         e.position.x = x
         e.position.y = y
-        e.expires = 0.2
+        e.expires = 0.5
         game.addSprite(e.sprite)
         active.push(e)
     } else {
@@ -330,7 +337,7 @@ function createParticle() {
         scale: {x: scale, y: scale},
         velocity: {x: velocityX, y: velocityY},
         tint: {r:0xfa, g:0xfa, b:0xd2, a:0xff},
-        expires: 0.4,
+        expires: 0.5,
         sprite: sprite
     }
 }

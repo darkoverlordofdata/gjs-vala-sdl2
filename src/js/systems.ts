@@ -2,25 +2,25 @@
  * Systems
  */
 import * as sdx from 'Sdx'
-import {Sdx} from 'Sdx'
+import {Input, Sdx} from 'Sdx'
 
-const fireRate = 0.1
-let timeToFire = 0
 const T1 = 1
 const T2 = 5
 const T3 = 7
-let enemyT1 = T1
-let enemyT2 = T2
-let enemyT3 = T3
+const fireRate = 0.1
+
+let enemyT1 = 0//T1
+let enemyT2 = T2/2
+let enemyT3 = T3/2
+let timeToFire = 0
 
 export function healthSystem(game, entities) {
     for (let e of entities.active) {
         if (e.active && e.health && e.text) {
-            let pct = Math.ceil(e.health.current/e.health.maximum*100.0)
-            let str = "%3f%%".printf(pct)
-            if (str !== e.text.text) {
-                e.text = sdx.createText(str, Sdx.app.font, sdx.graphics.Color.CHARTREUSE)
-            }
+            let pct = "%3f%%".printf(Math.ceil(e.health.current/e.health.maximum*100.0))
+            if (pct !== e.text.text) 
+                e.text = sdx.createText(pct, Sdx.app.font, sdx.graphics.Color.CHARTREUSE)
+            
             e.text.x = e.position.x
             e.text.y = e.position.y
             game.addOnce(e.text)
@@ -31,7 +31,7 @@ export function inputSystem(game, entities) {
     const player = entities.pool[0]
     player.position.x = game.mouseX
     player.position.y = game.mouseY
-    if (game.mouseDown || game.getKey(sdx.Input.Keys.z)) { /* fire system */
+    if (game.mouseDown || game.getKey(Input.Keys.z)) { /* fire system */
         timeToFire -= game.deltaTime
         if (timeToFire < 0) {
             timeToFire = fireRate
