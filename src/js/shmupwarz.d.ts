@@ -1,7 +1,7 @@
 /**
  * Entitas-ECS definitions for example
  */
-declare module entitas.utils {
+declare module 'entitas.utils' {
     /**
      * @class UUID
      */
@@ -17,7 +17,7 @@ declare module entitas.utils {
         static randomUUID(): string;
     }
 }
-declare module entitas.utils {
+declare module 'entitas.utils' {
     interface ImmutableBag<E> {
         get(index: number): E;
         size(): number;
@@ -29,7 +29,7 @@ declare module entitas.utils {
  * @port https://github.com/junkdog/artemis-odb/blob/master/artemis/src/main/java/com/artemis/utils/Bag.java
  * not a full implementation, mostly just what is needed by the game engine.
  */
-declare module entitas.utils {
+declare module 'entitas.utils' {
     /**
      * Collection type a bit like ArrayList but does not preserve the order of its
      * entities, speedwise it is very good, especially suited for games.
@@ -159,8 +159,8 @@ declare module entitas.utils {
         addAll(items: ImmutableBag<E>): void;
     }
 }
-declare module entitas.utils {
-    import Bag = entitas.utils.Bag;
+declare module 'entitas.utils' {
+    import {Bag} from  'entitas.utils';
     interface ISignal<T> {
         dispatch(...args: any[]): void;
         add(listener: T): void;
@@ -201,7 +201,7 @@ declare module entitas.utils {
         clear(): void;
     }
 }
-declare module entitas.utils {
+declare module 'entitas.utils' {
     class Stopwatch {
         isRunning: boolean;
         startTimeStamp: number;
@@ -217,7 +217,7 @@ declare module entitas.utils {
         static getTimeStamp(): number;
     }
 }
-declare module entitas {
+declare module 'entitas' {
     interface IComponent {
     }
 
@@ -303,7 +303,7 @@ declare module entitas {
     }
 
 }
-declare module entitas {
+declare module 'entitas' {
     interface IMatcher {
         id: number;
         indices: number[];
@@ -324,25 +324,25 @@ declare module entitas {
         noneOf(...args: any[]): INoneOfMatcher;
     }
 }
-declare module entitas {
-    import Pool = entitas.Pool;
+declare module 'entitas' {
+    import {Pool} from 'entitas';
     interface ISystem {
     }
     interface ISetPool {
         setPool(pool: Pool): any;
     }
 }
-declare module entitas {
+declare module 'entitas' {
     interface IExecuteSystem extends ISystem {
         execute(): any;
     }
 }
-declare module entitas {
+declare module 'entitas' {
     interface IInitializeSystem extends ISystem {
         initialize(): any;
     }
 }
-declare module entitas {
+declare module 'entitas' {
     interface IReactiveExecuteSystem extends ISystem {
         execute(entities: Array<Entity>): any;
     }
@@ -362,7 +362,7 @@ declare module entitas {
         clearAfterExecute: boolean;
     }
 }
-declare module entitas {
+declare module 'entitas' {
     class Exception {
         /** @type {string} */
         message: string;
@@ -376,8 +376,8 @@ declare module entitas {
         toString(): string;
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
     class EntityAlreadyHasComponentException extends Exception {
         /**
          * Entity Already Has Component Exception
@@ -388,8 +388,8 @@ declare module entitas.exceptions {
         constructor(message: string, index: number);
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
     class EntityDoesNotHaveComponentException extends Exception {
         /**
          * Entity Does Not Have Component Exception
@@ -400,8 +400,8 @@ declare module entitas.exceptions {
         constructor(message: string, index: number);
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
     class EntityIsAlreadyReleasedException extends Exception {
         /**
          * Entity Is Already Released Exception
@@ -410,8 +410,8 @@ declare module entitas.exceptions {
         constructor();
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
     class EntityIsNotDestroyedException extends Exception {
         /**
          * Entity Is Not Destroyed Exception
@@ -421,8 +421,8 @@ declare module entitas.exceptions {
         constructor(message: string);
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
     class EntityIsNotEnabledException extends Exception {
         /**
          * Entity Is Not Enabled Exception
@@ -432,8 +432,8 @@ declare module entitas.exceptions {
         constructor(message: string);
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
     class GroupObserverException extends Exception {
         /**
          * Group Observer Exception
@@ -443,8 +443,9 @@ declare module entitas.exceptions {
         constructor(message: string);
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
+    import {IMatcher} from 'entitas';
     class MatcherException extends Exception {
         /**
          * Matcher Exception
@@ -454,8 +455,9 @@ declare module entitas.exceptions {
         constructor(matcher: IMatcher);
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
+    import {Entity} from 'entitas';
     class PoolDoesNotContainEntityException extends Exception {
         /**
          * Pool Does Not Contain Entity Exception
@@ -466,8 +468,9 @@ declare module entitas.exceptions {
         constructor(entity: Entity, message: string);
     }
 }
-declare module entitas.exceptions {
-    import Exception = entitas.Exception;
+declare module 'entitas.exceptions' {
+    import {Exception} from 'entitas';
+    import {IMatcher} from 'entitas';
     class SingleEntityException extends Exception {
         /**
          * Single Entity Exception
@@ -477,8 +480,8 @@ declare module entitas.exceptions {
         constructor(matcher: IMatcher);
     }
 }
-declare module entitas {
-    import GroupEventType = entitas.GroupEventType;
+declare module 'entitas' {
+    import {GroupEventType} from 'entitas';
     class TriggerOnEvent {
         trigger: IMatcher;
         eventType: GroupEventType;
@@ -491,12 +494,12 @@ declare module entitas {
         constructor(trigger: IMatcher, eventType: GroupEventType);
     }
 }
-declare module entitas {
-    import Entity = entitas.Entity;
-    import IAllOfMatcher = entitas.IAllOfMatcher;
-    import IAnyOfMatcher = entitas.IAnyOfMatcher;
-    import INoneOfMatcher = entitas.INoneOfMatcher;
-    import TriggerOnEvent = entitas.TriggerOnEvent;
+declare module 'entitas' {
+    import {Entity} from 'entitas';
+    import {IAllOfMatcher} from 'entitas';
+    import {IAnyOfMatcher} from 'entitas';
+    import {INoneOfMatcher} from 'entitas';
+    import {TriggerOnEvent} from 'entitas';
     /**
      * Event Types
      * @readonly
@@ -638,9 +641,9 @@ declare module entitas {
  * entitas ecs
  * @const
  */
-declare module entitas {
-    import ISignal = entitas.utils.ISignal;
-    import IComponent = entitas.IComponent;
+declare module 'entitas' {
+    import {ISignal} from 'entitas.utils';
+    import {IComponent} from 'entitas';
     import EntityChanged = Entity.EntityChanged;
     import EntityReleased = Entity.EntityReleased;
     import IEntityChanged = Entity.IEntityChanged;
@@ -971,14 +974,14 @@ declare module entitas {
         release(): void;
     }
 }
-declare module entitas {
-    import Entity = entitas.Entity;
-    import ISignal = entitas.utils.ISignal;
-    import IMatcher = entitas.IMatcher;
-    import IComponent = entitas.IComponent;
+declare module 'entitas' {
+    import {Entity} from 'entitas';
+    import {ISignal} from 'entitas.utils';
+    import {IMatcher} from 'entitas';
+    import {IComponent} from 'entitas';
     import GroupChanged = Group.GroupChanged;
     import GroupUpdated = Group.GroupUpdated;
-    import GroupEventType = entitas.GroupEventType;
+    import {GroupEventType} from 'entitas';
     /**
      * event delegate boilerplate:
      */
@@ -1108,11 +1111,11 @@ declare module entitas {
         toString(): string;
     }
 }
-declare module entitas {
-    import Group = entitas.Group;
-    import Entity = entitas.Entity;
-    import IComponent = entitas.IComponent;
-    import GroupEventType = entitas.GroupEventType;
+declare module 'entitas' {
+    import {Group} from 'entitas';
+    import {Entity} from 'entitas';
+    import {IComponent} from 'entitas';
+    import {GroupEventType} from 'entitas';
     class GroupObserver {
         /**
          * Entities being observed
@@ -1151,14 +1154,14 @@ declare module entitas {
         addEntity: (group: Group, entity: Entity, index: number, component: IComponent) => void;
     }
 }
-declare module entitas {
-    import Bag = entitas.utils.Bag;
-    import Group = entitas.Group;
-    import Entity = entitas.Entity;
-    import ISignal = entitas.utils.ISignal;
-    import IMatcher = entitas.IMatcher;
+declare module 'entitas' {
+    import {Bag} from 'entitas.utils';
+    import {Group} from 'entitas';
+    import {Entity} from 'entitas';
+    import {ISignal} from 'entitas.utils';
+    import {IMatcher} from 'entitas';
     import PoolChanged = Pool.PoolChanged;
-    import IComponent = entitas.IComponent;
+    import {IComponent} from 'entitas';
     import GroupChanged = Pool.GroupChanged;
     /**
      * event delegate boilerplate:
@@ -1348,17 +1351,17 @@ declare module entitas {
         protected onEntityReleased: (entity: Entity) => void;
     }
 }
-declare module entitas {
-    import IMatcher = entitas.IMatcher;
-    import GroupObserver = entitas.GroupObserver;
-    import IReactiveSystem = entitas.IReactiveSystem;
-    import IMultiReactiveSystem = entitas.IMultiReactiveSystem;
+declare module 'entitas' {
+    import {IMatcher} from 'entitas';
+    import {GroupObserver} from 'entitas';
+    import {IReactiveSystem} from 'entitas';
+    import {IMultiReactiveSystem} from 'entitas';
     class ReactiveSystem implements IExecuteSystem {
         /**
          * Get subsystems
          * @type {entitas.IReactiveExecuteSystem}
          * @name entitas.Pool#subsystem */
-        subsystem: entitas.IReactiveExecuteSystem;
+        subsystem: IReactiveExecuteSystem;
         private _subsystem;
         _observer: GroupObserver;
         _ensureComponents: IMatcher;
@@ -1381,10 +1384,10 @@ declare module entitas {
         execute(): void;
     }
 }
-declare module entitas {
-    import ISystem = entitas.ISystem;
-    import IExecuteSystem = entitas.IExecuteSystem;
-    import IInitializeSystem = entitas.IInitializeSystem;
+declare module 'entitas' {
+    import {ISystem} from 'entitas';
+    import {IExecuteSystem} from 'entitas';
+    import {IInitializeSystem} from 'entitas';
     class Systems implements IInitializeSystem, IExecuteSystem {
         protected _initializeSystems: Array<IInitializeSystem>;
         protected _executeSystems: Array<IExecuteSystem>;
@@ -1409,7 +1412,7 @@ declare module entitas {
         clearReactiveSystems(): void;
     }
 }
-declare module entitas.viewer {
+declare module 'entitas.viewer' {
     /**
      * Profiler class for Entities
      */
@@ -1425,7 +1428,7 @@ declare module entitas.viewer {
         constructor(obj: any);
     }
 }
-declare module entitas.viewer {
+declare module 'entitas.viewer' {
     /**
      * Profiler class for Pools
      */
@@ -1444,7 +1447,7 @@ declare module entitas.viewer {
         constructor(_pool: any);
     }
 }
-declare module entitas.viewer {
+declare module 'entitas.viewer' {
     /** todo: SystemObserver track time spent in ms by system */
     /**
      * Profiler class for Systems
@@ -1466,8 +1469,8 @@ declare module entitas.viewer {
 /**
  * Inspired by Unity
  */
-declare module entitas.viewer {
-    import Pool = entitas.Pool;
+declare module 'entitas.viewer' {
+    import {Pool} from 'entitas';
     var gui: any;
     /**
      * @class VisualDebugging

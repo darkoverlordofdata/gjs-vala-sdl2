@@ -7,16 +7,19 @@
     "outFile": "bin/game"
   },
   "files": [
-    "node_modules/entitas-cli/build/entitas.d.ts",
+    // "node_modules/entitas-cli/build/entitas.d.ts",
     "src/js/gobject-2.0.d.ts",
     "src/js/sdx.d.ts",
     "src/js/gjs.d.ts",
     "src/js/gjs.js",
     "src/js/global.js",
-    "src/js/entitas.js",
-    "src/js/generatedComponents.ts",
-    "src/js/generatedExtensions.js",
+    "src/js/entitas-ecs.js",
+    "src/js/imports.ts",
     "src/js/sdx.shim.js",
-    "src/js/game.ts"
+    "src/js/components.ts",
+    "src/js/extensions.js",
+    "src/js/extensions/Pool.ts",
+    "src/js/shmupwarz.d.ts",
+    "src/js/shmupwarz.ts"
   ]
 }

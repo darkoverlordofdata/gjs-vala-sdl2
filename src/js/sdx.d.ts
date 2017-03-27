@@ -826,6 +826,8 @@ declare module 'Sdx' {
         showFps:boolean
         deltaTime:number
         font:any
+        width:number
+        height:number
         addSprite(sprite: GObject.Object):void
         addOnce(sprite: GObject.Object):void
         removeSprite(sprite: GObject.Object):void

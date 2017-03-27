@@ -1,7 +1,9 @@
 /**
- * Import ambient modules
+ * Shim to import ambient modules
  */
-// define.path("./bin")
-// define.imports({
-//     entitas: function() {return entitas}
-// })
+entitas['entitas'] = entitas
+define.imports({
+    entitas: entitas
+})
+
+

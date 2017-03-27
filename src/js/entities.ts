@@ -25,16 +25,6 @@ export const pool = new Array(2+BULLETS+ENEMIES+EXPLOSIONS+BANGS+PARTICLES)
 
 let uniqueId = 0
 
-function removeEntity(a, e) {
-    let i = a.indexOf(e)
-    if (i > -1) {
-        if (a[i].id !== e.id) throw new Error("Invalid remove id")
-        return a.splice(i,1)[0]
-    // } else {
-        //print(JSON.stringify(e,null, 2))
-        //throw new Error("Unable to remove "+e.id)
-    }
-}
 
 export function createPool(game) {
     let z = 0 
@@ -52,6 +42,13 @@ export function createPool(game) {
     Object.freeze(pool)
 }
 
+function removeEntity(a, e) {
+    let i = a.indexOf(e)
+    if (i > -1) {
+        if (a[i].id !== e.id) throw new Error("Invalid remove id")
+        return a.splice(i,1)[0]
+    }
+}
 
 export function deactivate(game, e) {
     if (!e.active) {
@@ -60,7 +57,6 @@ export function deactivate(game, e) {
     }
     e.active = false
     let z = removeEntity(active, e)
-    // let z = active.remove(e)
     if (!z) {
         print("z undefined")
         if (!e.active) {
