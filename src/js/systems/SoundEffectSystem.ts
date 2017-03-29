@@ -1,55 +1,49 @@
 import {Sdx} from 'Sdx'
-import {Pool} from 'entitas';
-import {Group} from 'entitas';
-import {Entity} from 'entitas';
-import {Matcher} from 'entitas';
-import {Exception} from 'entitas';
-import {TriggerOnEvent} from 'entitas';
-import {IExecuteSystem} from 'entitas';
-import {IInitializeSystem} from 'entitas';
-import {ISetPool} from 'entitas';
+import {Pool} from 'entitas'
+import {Group} from 'entitas'
+import {Entity} from 'entitas'
+import {Matcher} from 'entitas'
+import {Exception} from 'entitas'
+import {TriggerOnEvent} from 'entitas'
+import {IExecuteSystem} from 'entitas'
+import {IInitializeSystem} from 'entitas'
+import {ISetPool} from 'entitas'
 import {SoundEffectComponent} from 'components'
-import {Effect} from 'shmupwarz'
+import {Effect} from 'extensions'
+
+import sdx = require('Sdx')
 
 export class SoundEffectSystem implements IInitializeSystem, IExecuteSystem, ISetPool {
 
-  protected pool:Pool;
-  protected group:Group;
-  private pew;
-  private asplode;
-  private smallasplode;
-  private playSfx:boolean=false;
-  private effect;
+  protected pool:Pool
+  protected group:Group
+  private pew:sdx.audio.Sound
+  private asplode:sdx.audio.Sound
+  private smallasplode:sdx.audio.Sound
 
   public setPool(pool:Pool) {
-    this.pool = pool;
-    this.group = pool.getGroup(Matcher.allOf(Matcher.SoundEffect));
+    this.pool = pool
+    this.group = pool.getGroup(Matcher.allOf(Matcher.SoundEffect))
   }
 
-
   public execute() {
-    //if (!this.playSfx) return;
-    var entities = this.group.getEntities();
-    for (var i = 0, l = entities.length; i < l; i++) {
-      var e = entities[i];
-      var soundEffect:SoundEffectComponent = e.soundEffect;
-      var sound = this.effect[soundEffect.effect];
-      if (sound) sound.play();
-      e.removeSoundEffect();
+    let entities = this.group.getEntities()
+    for (let e of entities) {
+      let soundEffect:SoundEffectComponent = e.soundEffect
+      switch(soundEffect.effect) {
+        case Effect.PEW:          this.pew.play(0); break
+        case Effect.ASPLODE:      this.asplode.play(0); break
+        case Effect.SMALLASPLODE: this.smallasplode.play(0); break
+      }
+      e.removeSoundEffect()
     }
   }
 
   public initialize() {
-    var Howl = window['Howl'];
 
-    this.pew = new Howl({urls:['res/sounds/pew.ogg']});
-    this.asplode = new Howl({urls:['res/sounds/asplode.ogg']});
-    this.smallasplode = new Howl({urls:['res/sounds/smallasplode.ogg']});
-
-    this.effect = [];
-    this.effect[Effect.PEW] = this.pew;
-    this.effect[Effect.ASPLODE] = this.asplode;
-    this.effect[Effect.SMALLASPLODE] = this.smallasplode;
+    this.pew = sdx.createSound("sounds/pew.wav")
+    this.asplode = sdx.createSound("sounds/asplode.wav")
+    this.smallasplode = sdx.createSound("sounds/smallasplode.wav")
 
   }
 }

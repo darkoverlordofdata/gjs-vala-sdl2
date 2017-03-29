@@ -1,11 +1,11 @@
 {
-  "namespace": "example",
-  "src": "src/js",
+  "namespace": "shmupwarz",
+  "src": "tmp",
   "debug": false,
   "output": {
-    "javascript": "src/js/generatedExtensions.js",
-    "typescript": "src/js/generatedComponents.ts",
-    "declaration": "src/js/example.d.ts"
+    "javascript": "tmp/extensions.js",
+    "typescript": "tmp/components.ts",
+    "declaration": "tmp/shmupwarz.d.ts"
   },
   "alloc": {
     "entities": 200,

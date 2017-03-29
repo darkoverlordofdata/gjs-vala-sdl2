@@ -292,7 +292,7 @@ function createExplosion() {
         scale: {x: 0.5, y: 0.5},
         tween: {min: 0.5/100, max: 0.5, speed:-3, repeat:false, active:true},
         tint: {r:0xd2, g:0xfa, b:0xd2, a:0xfa},
-        sound: sdx.createSound("asplode/pew.wav"),
+        sound: sdx.createSound("sounds/asplode.wav"),
         expires: 0.2,
         sprite: sprite
     }
@@ -310,7 +310,7 @@ function createBang() {
         scale: {x: 0.2, y: 0.2},
         tween: {min: 0.2/100, max: 0.2, speed:-3, repeat:false, active:true},
         tint: {r:0xd2, g:0xfa, b:0xd2, a:0xfa},
-        sound: sdx.createSound("smallasplode/pew.wav"),
+        sound: sdx.createSound("sounds/smallasplode.wav"),
         expires: 0.2,
         sprite: sprite
     }

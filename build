@@ -14,6 +14,8 @@ valac   --pkg gee-0.8 \
         --library=sdx \
         -X -fPIC \
         -X -shared \
+        -X -O3 \
+        -X -g \
         --vapi=../../.local/lib//sdx.vapi \
         --gir ../../.local/lib//sdx-0.1.gir \
         -o ../../.local/lib/sdx.so \
@@ -81,29 +83,29 @@ g-ir-compiler ../../.local/lib//sdx-0.1.gir \
         --output=../../.local/lib//sdx-0.1.typelib 
         
 
-npm run gir2dts
-sed -i -e 's/extends sdx./extends /' src/js/sdx-0.1.d.ts
-cat << EOF > ./tsconfig.json
-{
-  "compilerOptions": {
-    "target": "es5",
-    "module": "amd",
-    "rootDir": "src/js",
-    "allowJs": true,
-    "outFile": "bin/game"
-  },
-  "files": [
-    "node_modules/entitas-cli/build/entitas.d.ts",
-    "src/js/gobject-2.0.d.ts",
-    "src/js/sdx-0.1.d.ts",
-    "src/js/gjs.d.ts",
-    "src/js/gjs.js",
-    "src/js/entitas.js",
-    "src/js/generatedExtensions.js",
-    "src/js/generatedComponents.ts",
-    "src/js/sdx.shim.js",
-    "src/js/global.js",
-    "src/js/game.js"
-  ]
-}
-EOF
+# npm run gir2dts
+# sed -i -e 's/extends sdx./extends /' src/js/sdx-0.1.d.ts
+# cat << EOF > ./tsconfig.json
+# {
+#   "compilerOptions": {
+#     "target": "es5",
+#     "module": "amd",
+#     "rootDir": "src/js",
+#     "allowJs": true,
+#     "outFile": "bin/game"
+#   },
+#   "files": [
+#     "node_modules/entitas-cli/build/entitas.d.ts",
+#     "src/js/gobject-2.0.d.ts",
+#     "src/js/sdx-0.1.d.ts",
+#     "src/js/gjs.d.ts",
+#     "src/js/gjs.js",
+#     "src/js/entitas.js",
+#     "src/js/generatedExtensions.js",
+#     "src/js/generatedComponents.ts",
+#     "src/js/sdx.shim.js",
+#     "src/js/global.js",
+#     "src/js/game.js"
+#   ]
+# }
+# EOF

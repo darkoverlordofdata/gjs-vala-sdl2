@@ -43,6 +43,7 @@ namespace sdx.scenes.scene2d.ui
         def layout()
             var textSurface = _style.font.render(text, _style.fontColor)
             var texture = SDL.Video.Texture.create_from_surface(Sdx.app.renderer, textSurface)            
+            sdlFailIf(texture == null, "Unable to load image texture Label.layout!")
 
         def draw(batch: Batch, parentAlpha: double)
             pass

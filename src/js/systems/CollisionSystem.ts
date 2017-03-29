@@ -1,76 +1,74 @@
 import {Sdx} from 'Sdx'
-import {Pool} from 'entitas';
-import {Group} from 'entitas';
-import {Entity} from 'entitas';
-import {Matcher} from 'entitas';
-import {Exception} from 'entitas';
-import {TriggerOnEvent} from 'entitas';
-import {IExecuteSystem} from 'entitas';
-import {IInitializeSystem} from 'entitas';
-import {ISetPool} from 'entitas';
+import {Pool} from 'entitas'
+import {Group} from 'entitas'
+import {Entity} from 'entitas'
+import {Matcher} from 'entitas'
+import {Exception} from 'entitas'
+import {TriggerOnEvent} from 'entitas'
+import {IExecuteSystem} from 'entitas'
+import {IInitializeSystem} from 'entitas'
+import {ISetPool} from 'entitas'
 import {PositionComponent} from 'components'
 import {HealthComponent} from 'components'
 import {ScoreComponent} from 'components'
 import {BoundsComponent} from 'components'
-import {Effect} from 'extensions/Pool'
+import {Effect} from 'extensions'
 
 
 export class CollisionSystem implements IInitializeSystem, IExecuteSystem, ISetPool {
 
-  protected pool: Pool;
-  protected group: Group;
-  protected bullets: Group;
-  protected enemies: Group;
-  private collisionPairs: Array<CollisionPair>;
+  protected pool: Pool
+  protected group: Group
+  protected bullets: Group
+  protected enemies: Group
+  private collisionPairs: Array<CollisionPair>
 
   public setPool(pool: Pool) {
-    this.pool = pool;
+    this.pool = pool
   }
-
 
   /**
    * Check for Collision
    */
   public execute() {
-    var collisionPairs = this.collisionPairs;
-    for (var i = 0, l = collisionPairs.length; l > i; i++) {
-      collisionPairs[i].checkForCollisions();
-    }
+    let collisionPairs = this.collisionPairs
+    for (let pair of collisionPairs)
+      pair.checkForCollisions()
   }
 
   /**
    * Create collision handlers
    */
   public initialize() {
-    this.pool.setScore(0);
-    this.bullets = this.pool.getGroup(Matcher.Bullet);
-    this.enemies = this.pool.getGroup(Matcher.Enemy);
+    this.pool.setScore(0)
+    this.bullets = this.pool.getGroup(Matcher.Bullet)
+    this.enemies = this.pool.getGroup(Matcher.Enemy)
 
     /** Check for bullets hitting enemy ship */
-    this.collisionPairs = [];
+    this.collisionPairs = []
     this.collisionPairs.push(new CollisionPair(this, this.bullets, this.enemies, {
 
       handleCollision: (bullet: Entity, ship: Entity) => {
-        var bp: PositionComponent = bullet.position;
-        var health: HealthComponent = ship.health;
-        var position: PositionComponent = ship.position;
-        var x = bp.x;
-        var y = bp.y;
+        let bp: PositionComponent = bullet.position
+        let health: HealthComponent = ship.health
+        let position: PositionComponent = ship.position
+        let x = bp.x
+        let y = bp.y
 
-        this.pool.createSmallExplosion(x, y);
-        var i = 5;
-        while (--i > 0) this.pool.createParticle(x, y);
+        this.pool.createSmallExplosion(x, y)
+        let i = 5
+        while (--i > 0) this.pool.createParticle(x, y)
 
-        bullet.setDestroy(true);
-        health.health -= 1;
+        bullet.setDestroy(true)
+        health.health -= 2
         if (health.health < 0) {
-          var score: ScoreComponent = <ScoreComponent>(this.pool.score);
-          this.pool.replaceScore(score.value + ship.health.maximumHealth);
-          ship.setDestroy(true);
-          this.pool.createBigExplosion(position.x, position.y);
+          let score: ScoreComponent = <ScoreComponent>(this.pool.score)
+          this.pool.replaceScore(score.value + ship.health.maximumHealth)
+          ship.setDestroy(true)
+          this.pool.createBigExplosion(position.x, position.y)
         }
       }
-    }));
+    }))
   }
 }
 
@@ -79,31 +77,31 @@ export class CollisionSystem implements IInitializeSystem, IExecuteSystem, ISetP
  *
  */
 class CollisionPair {
-  private groupEntitiesA: Group;
-  private groupEntitiesB: Group;
-  private handler: CollisionHandler;
-  private cs: CollisionSystem;
+  private groupEntitiesA: Group
+  private groupEntitiesB: Group
+  private handler: CollisionHandler
+  private cs: CollisionSystem
 
   constructor(cs: CollisionSystem, group1, group2, handler: CollisionHandler) {
-    this.groupEntitiesA = group1;
-    this.groupEntitiesB = group2;
-    this.handler = handler;
-    this.cs = cs;
+    this.groupEntitiesA = group1
+    this.groupEntitiesB = group2
+    this.handler = handler
+    this.cs = cs
   }
 
   public checkForCollisions() {
-    var handler = this.handler;
-    var groupEntitiesA = this.groupEntitiesA.getEntities();
-    var groupEntitiesB = this.groupEntitiesB.getEntities();
-    var sizeA = groupEntitiesA.length;
-    var sizeB = groupEntitiesB.length;
+    let handler = this.handler
+    let groupEntitiesA = this.groupEntitiesA.getEntities()
+    let groupEntitiesB = this.groupEntitiesB.getEntities()
+    let sizeA = groupEntitiesA.length
+    let sizeB = groupEntitiesB.length
 
-    for (var a = 0; sizeA > a; a++) {
-      var entityA: Entity = groupEntitiesA[a];
-      for (var b = 0; sizeB > b; b++) {
-        var entityB: Entity = groupEntitiesB[b];
+    for (let a = 0; sizeA > a; a++) {
+      let entityA: Entity = groupEntitiesA[a]
+      for (let b = 0; sizeB > b; b++) {
+        let entityB: Entity = groupEntitiesB[b]
         if (this.collisionExists(entityA, entityB)) {
-          handler.handleCollision(entityA, entityB);
+          handler.handleCollision(entityA, entityB)
         }
       }
     }
@@ -111,21 +109,21 @@ class CollisionPair {
 
   private collisionExists(e1: Entity, e2: Entity): boolean {
 
-    if (e1 === null || e2 === null) return false;
+    if (e1 === null || e2 === null) return false
 
-    var p1: PositionComponent = e1.position;
-    var p2: PositionComponent = e2.position;
+    let p1: PositionComponent = e1.position
+    let p2: PositionComponent = e2.position
 
-    var b1: BoundsComponent = e1.bounds;
-    var b2: BoundsComponent = e2.bounds;
+    let b1: BoundsComponent = e1.bounds
+    let b2: BoundsComponent = e2.bounds
 
-    var a = p1.x - p2.x;
-    var b = p1.y - p2.y;
-    return Math.sqrt(a * a + b * b) - (b1.radius) < (b2.radius);
+    let a = p1.x - p2.x
+    let b = p1.y - p2.y
+    return Math.sqrt(a * a + b * b) - (b1.radius) < (b2.radius)
   }
 }
 
 interface CollisionHandler {
-  handleCollision(a: Entity, b: Entity);
+  handleCollision(a: Entity, b: Entity)
 }
 

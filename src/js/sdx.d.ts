@@ -10,6 +10,7 @@ declare module 'Sdx' {
     export function createJsGame(name: string, height: number, width: number, base: string):JsGame
     export function createGame(name: string, height: number, width: number, base: string):JsGame
     export function createSprite(path: string):graphics.s2d.Sprite 
+    export function createAtlas(path: string):graphics.s2d.TextureAtlas 
     export function createSound(path: string):audio.Sound
     export function createFont(path: string, size: number):graphics.s2d.Font
     export function createText(text: string, font: GObject.Object, color: GObject.Object):graphics.s2d.Sprite

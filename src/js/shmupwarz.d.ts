@@ -1,5 +1,5 @@
 /**
- * Entitas-ECS definitions for example
+ * Entitas-ECS definitions for shmupwarz
  */
 declare module 'entitas.utils' {
     /**
@@ -160,7 +160,7 @@ declare module 'entitas.utils' {
     }
 }
 declare module 'entitas.utils' {
-    import {Bag} from  'entitas.utils';
+    import {Bag} from 'entitas.utils';
     interface ISignal<T> {
         dispatch(...args: any[]): void;
         add(listener: T): void;
@@ -446,6 +446,8 @@ declare module 'entitas.exceptions' {
 declare module 'entitas.exceptions' {
     import {Exception} from 'entitas';
     import {IMatcher} from 'entitas';
+    import {Entity} from 'entitas';
+    
     class MatcherException extends Exception {
         /**
          * Matcher Exception
@@ -513,7 +515,7 @@ declare module 'entitas' {
     module Matcher {
     }
     class Matcher implements IAllOfMatcher, IAnyOfMatcher, INoneOfMatcher {
-/** Matcher Extensions for example */
+/** Matcher Extensions for shmupwarz */
         static _matcherBounds;
         static Bounds: Matcher;
         static _matcherBullet;
@@ -685,7 +687,7 @@ declare module 'entitas' {
         }
     }
     class Entity {
-/** Entity Extensions for example */
+/** Entity Extensions for shmupwarz */
         static _boundsComponentPool;
         static clearBoundsComponentPool();
         bounds: BoundsComponent;
@@ -1195,7 +1197,7 @@ declare module 'entitas' {
      * The games world.
      */
     class Pool {
-/*** Extensions for example.Pool */
+/*** Extensions for shmupwarz.Pool */
         createPlayer():void;
         createBullet(x:number, y:number):void;
         createParticle(x:number, y:number):void;
@@ -1204,7 +1206,7 @@ declare module 'entitas' {
         createEnemy1():void;
         createEnemy2():void;
         createEnemy3():void;
-/** Pool Extensions for example */
+/** Pool Extensions for shmupwarz */
         scoreEntity: Entity;
         score: ScoreComponent;
         hasScore: boolean;

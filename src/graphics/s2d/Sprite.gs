@@ -56,12 +56,15 @@ namespace sdx.graphics.s2d
         construct file(file: FileHandle)
             path = file.getPath()
             var raw = file.getRWops()
+            if raw == null do return
+            sdlFailIf(raw == null, @"Unable to load RWops for Sprite.file: $path")
             var surface = Texture.getSurface(file.getExt(), raw)
 
             texture = Video.Texture.create_from_surface(Sdx.app.renderer, surface)
-            sdlFailIf(texture == null, "Unable to load image texture!")
-
+        
+            sdlFailIf(texture == null, @"Unable to load image texture in Sprite.file: $path")
             texture.set_blend_mode(Video.BlendMode.BLEND)
+
             width = surface.w
             height = surface.h
 
@@ -85,6 +88,7 @@ namespace sdx.graphics.s2d
                     32, rmask, gmask, bmask, amask)
             region.texture.data.blit({x, y, w, h}, surface, {0, 0, w, h})
             this.texture = Video.Texture.create_from_surface(Sdx.app.renderer, surface)
+            sdlFailIf(this.texture == null, "Unable to load image texture Sprite.region!")
             this.texture.set_blend_mode(Video.BlendMode.BLEND)
             this.width = surface.w
             this.height = surface.h
@@ -101,7 +105,7 @@ namespace sdx.graphics.s2d
             var surface = font.render(text, color)
 
             texture = Video.Texture.create_from_surface(Sdx.app.renderer, surface)
-            sdlFailIf(texture == null, "Unable to load image texture!")
+            sdlFailIf(texture == null, "Unable to load image texture Sprite.text!")
 
             texture.set_blend_mode(Video.BlendMode.BLEND)
             width = surface.w
@@ -129,7 +133,7 @@ namespace sdx.graphics.s2d
             var surface = font.render(text, color)
 
             texture = Video.Texture.create_from_surface(Sdx.app.renderer, surface)
-            sdlFailIf(texture == null, "Unable to load image texture!")
+            sdlFailIf(texture == null, "Unable to load image texture Sprite.setText!")
 
             texture.set_blend_mode(Video.BlendMode.BLEND)
             width = surface.w
@@ -145,6 +149,7 @@ namespace sdx.graphics.s2d
          * @param clip optional clipping rectangle
          */
         def render(renderer: Video.Renderer, x : int, y : int, clip : Video.Rect? = null)
+            if texture == null do return
             /* do clipping? */
             var w = (int)((clip == null ? width : clip.w) * scale.x)
             var h = (int)((clip == null ? height : clip.h) * scale.y)
