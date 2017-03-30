@@ -24,7 +24,14 @@ Object.defineProperties(window, {
             };
         }({
             Lang: { id: 'Lang', exports: imports.lang },
-            Sdx: { id: 'Sdx', exports: imports.gi.sdx }
+            Sdx: { id: 'Sdx', exports: imports.gi.sdx },
+            Gio: { id: 'Gio', exports: imports.gi.Gio },
+            Atk: { id: 'Atk', exports: imports.gi.Atk },
+            Gdk: { id: 'Gdk', exports: imports.gi.Gdk },
+            Gtk: { id: 'Gtk', exports: imports.gi.Gtk },
+            GLib: { id: 'GLib', exports: imports.gi.GLib },
+            Pango: { id: 'Pango', exports: imports.gi.Pango },
+            GObject: { id: 'GObject', exports: imports.gi.GObject }
         })) },
     console: { value: {
             log: function () { print.apply(null, arguments); },
@@ -2518,6 +2525,7 @@ define.imports({
 });
 define("shim.sdx", ["require", "exports", "Sdx"], function (require, exports, sdx) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     Object.defineProperties(sdx, {
         createGame: { value: function (t, h, w, b) {
                 var g = sdx.createJsGame(t, h, w, b);
@@ -2620,6 +2628,7 @@ define("shim.sdx", ["require", "exports", "Sdx"], function (require, exports, sd
 });
 define("components", ["require", "exports", "entitas", "entitas", "entitas", "entitas.exceptions", "entitas.utils"], function (require, exports, entitas_1, entitas_2, entitas_3, entitas_exceptions_1, entitas_utils_1) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var CoreComponentIds;
     (function (CoreComponentIds) {
         CoreComponentIds[CoreComponentIds["Bounds"] = 0] = "Bounds";
@@ -4218,6 +4227,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
  */
 define("extensions", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_1, entitas_4) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var Layer;
     (function (Layer) {
         Layer[Layer["BACKGROUND"] = 0] = "BACKGROUND";
@@ -4371,6 +4381,7 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
 });
 define("systems/MovementSystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_2, entitas_5) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var MovementSystem = (function () {
         function MovementSystem() {
         }
@@ -4396,6 +4407,7 @@ define("systems/MovementSystem", ["require", "exports", "Sdx", "entitas"], funct
 });
 define("systems/PlayerInputSystem", ["require", "exports", "Sdx", "Sdx", "entitas"], function (require, exports, Sdx_3, Sdx_4, entitas_6) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var PlayerInputSystem = (function () {
         function PlayerInputSystem() {
             this.timeToFire = 0;
@@ -4436,6 +4448,7 @@ define("systems/PlayerInputSystem", ["require", "exports", "Sdx", "Sdx", "entita
 });
 define("systems/SoundEffectSystem", ["require", "exports", "entitas", "extensions", "Sdx"], function (require, exports, entitas_7, extensions_1, sdx) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var SoundEffectSystem = (function () {
         function SoundEffectSystem() {
         }
@@ -4473,6 +4486,7 @@ define("systems/SoundEffectSystem", ["require", "exports", "entitas", "extension
 });
 define("systems/CollisionSystem", ["require", "exports", "entitas"], function (require, exports, entitas_8) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var CollisionSystem = (function () {
         function CollisionSystem() {
         }
@@ -4507,7 +4521,7 @@ define("systems/CollisionSystem", ["require", "exports", "entitas"], function (r
                     var x = bp.x;
                     var y = bp.y;
                     _this.pool.createSmallExplosion(x, y);
-                    var i = 5;
+                    var i = 3;
                     while (--i > 0)
                         _this.pool.createParticle(x, y);
                     bullet.setDestroy(true);
@@ -4566,6 +4580,7 @@ define("systems/CollisionSystem", ["require", "exports", "entitas"], function (r
 });
 define("systems/ExpiringSystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_5, entitas_9) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var ExpiringSystem = (function () {
         function ExpiringSystem() {
         }
@@ -4589,9 +4604,10 @@ define("systems/ExpiringSystem", ["require", "exports", "Sdx", "entitas"], funct
 });
 define("systems/EntitySpawningTimerSystem", ["require", "exports", "Sdx"], function (require, exports, Sdx_6) {
     "use strict";
-    var T1 = 1; //2
-    var T2 = 5; //6
-    var T3 = 7; //12
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var T1 = 2; //1 //2
+    var T2 = 6; //5 //6
+    var T3 = 12; //7 //12
     var EntitySpawningTimerSystem = (function () {
         function EntitySpawningTimerSystem() {
             this.enemyT1 = 0; //T1
@@ -4633,6 +4649,7 @@ define("systems/EntitySpawningTimerSystem", ["require", "exports", "Sdx"], funct
 });
 define("systems/ScaleAnimationSystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_7, entitas_10) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var ScaleAnimationSystem = (function () {
         function ScaleAnimationSystem() {
         }
@@ -4671,6 +4688,7 @@ define("systems/ScaleAnimationSystem", ["require", "exports", "Sdx", "entitas"],
 });
 define("systems/RemoveOffscreenShipsSystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_8, entitas_11) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var RemoveOffscreenShipsSystem = (function () {
         function RemoveOffscreenShipsSystem() {
         }
@@ -4696,6 +4714,7 @@ define("systems/RemoveOffscreenShipsSystem", ["require", "exports", "Sdx", "enti
 });
 define("systems/AddViewSystem", ["require", "exports", "Sdx", "entitas", "Sdx"], function (require, exports, Sdx_9, entitas_12, sdx) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var AddViewSystem = (function () {
         function AddViewSystem() {
             var _this = this;
@@ -4745,6 +4764,7 @@ define("systems/AddViewSystem", ["require", "exports", "Sdx", "entitas", "Sdx"],
 });
 define("systems/DestroySystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_10, entitas_13) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var DestroySystem = (function () {
         function DestroySystem() {
         }
@@ -4766,6 +4786,7 @@ define("systems/DestroySystem", ["require", "exports", "Sdx", "entitas"], functi
 });
 define("shmupwarz", ["require", "exports", "Sdx", "entitas", "components", "systems/MovementSystem", "systems/PlayerInputSystem", "systems/SoundEffectSystem", "systems/CollisionSystem", "systems/ExpiringSystem", "systems/EntitySpawningTimerSystem", "systems/ScaleAnimationSystem", "systems/RemoveOffscreenShipsSystem", "systems/AddViewSystem", "systems/DestroySystem"], function (require, exports, Sdx_11, entitas_14, components_1, MovementSystem_1, PlayerInputSystem_1, SoundEffectSystem_1, CollisionSystem_1, ExpiringSystem_1, EntitySpawningTimerSystem_1, ScaleAnimationSystem_1, RemoveOffscreenShipsSystem_1, AddViewSystem_1, DestroySystem_1) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var example;
     (function (example) {
         function main() {

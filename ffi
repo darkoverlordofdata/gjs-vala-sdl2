@@ -1,0 +1,179 @@
+#!/usr/bin/env node
+
+const ffi = require('ffi')
+const ref = require('ref')
+
+const GObject = ref.types.void
+const GObjectPtr = ref.refType(GObject)
+const GObjectPtrPtr = ref.refType(GObjectPtr)
+/**
+ * Sdx api
+ */
+const sdx = ffi.Library('sdx', {
+    sdx_createJsGame: [GObjectPtr, ['string', 'int', 'int', 'string'] ],
+    sdx_createSprite: [GObjectPtr, ['string'] ],
+    sdx_createAtlas: [GObjectPtr, ['string'] ],
+    sdx_createSound: [GObjectPtr, ['string'] ],
+    sdx_createFont: [GObjectPtr, ['string', 'int'] ],
+    sdx_createText: [GObjectPtr, ['string', GObjectPtr, GObjectPtr] ],
+    sdx_createColor: [GObjectPtr, ['double', 'double', 'double', 'double'] ],
+    sdx_js_game_start: ['void', [GObjectPtr]],
+    sdx_js_game_get_running: ['bool', [GObjectPtr]],
+    sdx_js_game_handleEvents: ['void', [GObjectPtr]],
+    sdx_js_game_getKey: ['bool', [GObjectPtr, 'int']],
+    sdx_js_game_draw: ['void', [GObjectPtr]],
+    sdx_js_game_get_profile: ['bool', [GObjectPtr]],
+    sdx_js_game_set_profile: ['void', [GObjectPtr, 'bool']],
+    sdx_js_game_get_mouse_x: ['int', [GObjectPtr]],
+    sdx_js_game_get_mouse_y: ['int', [GObjectPtr]],
+    sdx_js_game_get_mouse_down: ['bool', [GObjectPtr]],
+    sdx_js_game_get_show_fps: ['bool', [GObjectPtr]],
+    sdx_js_game_set_show_fps: ['void', [GObjectPtr], 'bool'],
+    sdx_js_game_get_delta_time: ['double', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_get_x: ['int', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_x: ['void', [GObjectPtr, 'int']],
+    sdx_graphics_s2d_sprite_get_y: ['int', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_y: ['void', [GObjectPtr, 'int']],
+    sdx_graphics_s2d_sprite_get_r: ['double', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_r: ['void', [GObjectPtr, 'double']],
+    sdx_graphics_s2d_sprite_get_g: ['double', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_g: ['void', [GObjectPtr, 'double']],
+    sdx_graphics_s2d_sprite_get_b: ['double', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_b: ['void', [GObjectPtr, 'double']],
+    sdx_graphics_s2d_sprite_get_a: ['double', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_a: ['void', [GObjectPtr, 'double']],
+    sdx_graphics_s2d_sprite_get_width: ['int', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_width: ['void', [GObjectPtr, 'int']],
+    sdx_graphics_s2d_sprite_get_height: ['int', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_height: ['void', [GObjectPtr, 'int']],
+    sdx_graphics_s2d_sprite_get_centered: ['bool', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_centered: ['void', [GObjectPtr, 'bool']],
+    sdx_graphics_s2d_sprite_get_layer: ['int', [GObjectPtr]],
+    sdx_graphics_s2d_sprite_set_layer: ['void', [GObjectPtr, 'int']],
+    sdx_graphics_s2d_sprite_setScale: ['void', [GObjectPtr, 'double', 'double']],
+    sdx_graphics_s2d_sprite_setColor: ['void', [GObjectPtr, 'double', 'double', 'double']],
+    sdx_graphics_s2d_sprite_setText: ['void', [GObjectPtr, 'string', GObjectPtr, GObjectPtr]]
+    
+})
+
+Object.defineProperties(sdx, {
+    createGame: { value: function(title, height, width, base) {
+        const game = sdx.sdx_createJsGame(title, height, width, base)
+        Object.defineProperties(game, {
+            name:       { get: () => sdx.sdx_js_game_get_name(game) },
+            base:       { get: () => sdx.sdx_js_game_get_base(game) },
+            running:    { get: () => sdx.sdx_js_game_get_running(game) },
+            profile:    { get: () => sdx.sdx_js_game_get_profile(game),
+                          set: (v) => sdx.sdx_js_game_set_profile(game, v) },
+            mouseX:     { get: () => sdx.sdx_js_game_get_mouse_x(game) },
+            mouseY:     { get: () => sdx.sdx_js_game_get_mouse_y(game) },
+            mouseDown:  { get: () => sdx.sdx_js_game_get_mouse_down(game) },
+            showFps:    { get: () => sdx.sdx_js_game_get_show_fps(game),
+                          set: (v) => sdx.sdx_js_game_set_show_fps(game, v) },
+            deltaTime:  { get: () => sdx.sdx_js_game_get_delta_time(game) },
+            start:          { value: () => sdx.sdx_js_game_start(game) },
+            handleEvents:   { value: () => sdx.sdx_js_game_handleEvents(game) },
+            getKey:         { value: (key) => sdx.sdx_js_game_getKey(game, key) },
+            draw:           { value: () => sdx.sdx_js_game_draw(game) },
+            addSprite:      { value: (sprite) => sdx.sdx_js_game_draw(game, sprite) },
+            addOnce:        { value: (sprite) => sdx.sdx_js_game_draw(game, sprite) },
+            removeSprite:   { value: (sprite) => sdx.sdx_js_game_draw(game, sprite) },
+        })
+        return game
+    }},
+    createSprite: { value: function(path) {
+        const sprite = sdx.sdx_createSprite(path)
+        Object.defineProperties(sprite, {
+            x:          { get: () => sdx.sdx_graphics_s2d_sprite_get_x(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_x(sprite, v) },
+            y:          { get: () => sdx.sdx_graphics_s2d_sprite_get_y(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_y(sprite, v) },
+            r:          { get: () => sdx.sdx_graphics_s2d_sprite_get_r(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_r(sprite, v) },
+            g:          { get: () => sdx.sdx_graphics_s2d_sprite_get_g(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_g(sprite, v) },
+            b:          { get: () => sdx.sdx_graphics_s2d_sprite_get_b(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_b(sprite, v) },
+            a:          { get: () => sdx.sdx_graphics_s2d_sprite_get_a(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_a(sprite, v) },
+            width:      { get: () => sdx.sdx_graphics_s2d_sprite_get_width(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_width(sprite, v) },
+            height:     { get: () => sdx.sdx_graphics_s2d_sprite_get_height(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_height(sprite, v) },
+            centered:   { get: () => sdx.sdx_graphics_s2d_sprite_get_centered(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_centered(sprite, v) },
+            layer:      { get: () => sdx.sdx_graphics_s2d_sprite_get_layer(sprite),
+                          set: (v) => sdx.sdx_graphics_s2d_sprite_set_layer(sprite, v) },
+            setScale:       { value: (x, y) => sdx.sdx_graphics_s2d_sprite_setScale(sprite, x, y) },
+            setColor:       { value: (r, g, b) => sdx.sdx_graphics_s2d_sprite_setColor(sprite, r, g, b) },
+            setText:        { value: (str, font, color) => sdx.sdx_graphics_s2d_sprite_setText(sprite, str, font, color) },
+                          
+                          
+        })
+        return sprite
+    }},
+    // createAtlas: { value: function(path) {
+    //     const atlas = sdx.sdx_createAtlas(path)
+    //     Object.defineProperties(atlas, {
+    //         x:          { get: () => sdx.sdx_graphics_s2d_sprite_get_x(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_x(sprite, v) },
+    //         y:          { get: () => sdx.sdx_graphics_s2d_sprite_get_y(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_y(sprite, v) },
+    //     })
+    //     return atlas
+    // }},
+    // createSound: { value: function(path) {
+    //     const sound = sdx.sdx_createSound(path)
+    //     Object.defineProperties(sound, {
+    //         x:          { get: () => sdx.sdx_graphics_s2d_sprite_get_x(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_x(sprite, v) },
+    //         y:          { get: () => sdx.sdx_graphics_s2d_sprite_get_y(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_y(sprite, v) },
+    //     })
+    //     return sound
+    // }},
+    // createFont: { value: function(path, size) {
+    //     const font = sdx.sdx_createFont(path, size)
+    //     Object.defineProperties(font, {
+    //         x:          { get: () => sdx.sdx_graphics_s2d_sprite_get_x(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_x(sprite, v) },
+    //         y:          { get: () => sdx.sdx_graphics_s2d_sprite_get_y(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_y(sprite, v) },
+    //     })
+    //     return font
+    // }},
+    // createText: { value: function(text, font, color) {
+    //     const text = sdx.sdx_createSprite(text, font, color)
+    //     Object.defineProperties(text, {
+    //         x:          { get: () => sdx.sdx_graphics_s2d_sprite_get_x(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_x(sprite, v) },
+    //         y:          { get: () => sdx.sdx_graphics_s2d_sprite_get_y(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_y(sprite, v) },
+    //     })
+    //     return text
+    // }},
+    // createColor: { value: function(r, g, b, a) {
+    //     const color = sdx.sdx_createColor(r, g, b, a)
+    //     Object.defineProperties(color, {
+    //         x:          { get: () => sdx.sdx_graphics_s2d_sprite_get_x(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_x(sprite, v) },
+    //         y:          { get: () => sdx.sdx_graphics_s2d_sprite_get_y(sprite),
+    //                       set: (v) => sdx.sdx_graphics_s2d_sprite_set_y(sprite, v) },
+    //     })
+    //     return color
+    // }},
+    
+
+})
+
+let game = sdx.createGame("Frodo", 400, 600, "/home/bruce/gjs/gjs-vala-sdl2/data/")
+game.start()
+game.profile = true
+while (game.running) {
+    game.handleEvents()
+    if (game.getKey(27)) break
+    else {
+        game.draw()
+    }
+}
+

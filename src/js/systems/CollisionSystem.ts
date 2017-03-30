@@ -56,7 +56,7 @@ export class CollisionSystem implements IInitializeSystem, IExecuteSystem, ISetP
         let y = bp.y
 
         this.pool.createSmallExplosion(x, y)
-        let i = 5
+        let i = 3
         while (--i > 0) this.pool.createParticle(x, y)
 
         bullet.setDestroy(true)

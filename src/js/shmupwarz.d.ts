@@ -512,7 +512,8 @@ declare module 'entitas' {
         OnEntityRemoved = 1,
         OnEntityAddedOrRemoved = 2,
     }
-    module Matcher {
+    // module Matcher {
+    namespace Matcher {
     }
     class Matcher implements IAllOfMatcher, IAnyOfMatcher, INoneOfMatcher {
 /** Matcher Extensions for shmupwarz */
@@ -651,7 +652,8 @@ declare module 'entitas' {
     import IEntityChanged = Entity.IEntityChanged;
     import IEntityReleased = Entity.IEntityReleased;
     import ComponentReplaced = Entity.ComponentReplaced;
-    module Entity {
+    // module Entity {
+    namespace Entity {
         /**
          * Event EntityReleased
          *
@@ -987,7 +989,8 @@ declare module 'entitas' {
     /**
      * event delegate boilerplate:
      */
-    module Group {
+    // module Group {
+    namespace Group {
         interface GroupChanged {
             (group: Group, entity: Entity, index: number, component: IComponent): void;
         }
@@ -1168,7 +1171,8 @@ declare module 'entitas' {
     /**
      * event delegate boilerplate:
      */
-    module Pool {
+    // module Pool {
+    namespace Pool {
         /**
          * Event PoolChanged
          *

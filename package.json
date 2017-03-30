@@ -31,6 +31,7 @@
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
-    "entitas-cli": "^0.2.0"
+    "entitas-cli": "^0.2.0",
+    "ffi": "^2.2.0"
   }
 }

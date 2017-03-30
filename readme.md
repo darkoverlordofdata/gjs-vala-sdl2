@@ -15,14 +15,7 @@ $ ./build
 $ ./run
 ```
 
-generates:
-* sdx.so
-* sdx.vapi
-* sdx-0.1.gir
-* sdx-0.1.typelib
-* sdx-0.1.d.ts
-
-## example
+# example
 
 ```javascript
 const sdx = imports.gi.sdx; 

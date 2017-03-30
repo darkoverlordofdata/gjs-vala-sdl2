@@ -9,9 +9,9 @@ import {IExecuteSystem} from 'entitas'
 import {IInitializeSystem} from 'entitas'
 import {ISetPool} from 'entitas'
 
-const T1:number = 1 //2
-const T2:number = 5 //6
-const T3:number = 7 //12
+const T1:number = 2//1 //2
+const T2:number = 6//5 //6
+const T3:number = 12//7 //12
 
 
 export class EntitySpawningTimerSystem implements IExecuteSystem, IInitializeSystem, ISetPool {
