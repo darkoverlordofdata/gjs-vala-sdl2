@@ -24,9 +24,9 @@ const sdx = ffi.Library('sdx', {
     sdx_graphics_color_set_r: ['void', [GObjectPtr, 'double']],
     sdx_graphics_color_get_g: ['double', [GObjectPtr]],
     sdx_graphics_color_set_g: ['void', [GObjectPtr, 'double']],
-    sdx_graphics_color_get_b ['double', [GObjectPtr]],
+    sdx_graphics_color_get_b: ['double', [GObjectPtr]],
     sdx_graphics_color_set_b: ['void', [GObjectPtr, 'double']],
-    sdx_graphics_color_get_a ['double', [GObjectPtr]],
+    sdx_graphics_color_get_a: ['double', [GObjectPtr]],
     sdx_graphics_color_set_a: ['void', [GObjectPtr, 'double']],
     
     sdx_graphics_color_get_RED: [GObjectPtr, []],
@@ -198,6 +198,7 @@ Object.defineProperties(sdx.graphics, {
 })
 Object.defineProperties(sdx.graphics.color, {
     RED:        { get: () => sdx.sdx_graphics_color_get_RED() },
+    LIME:       { get: () => sdx.sdx_graphics_color_get_LIME() },
 })
 
 let game = sdx.createGame("Frodo", 400, 600, "/home/bruce/gjs/gjs-vala-sdl2/data/")

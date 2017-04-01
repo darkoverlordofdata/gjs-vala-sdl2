@@ -17,10 +17,10 @@ namespace sdx.graphics
 
     class Color:  Object
 
-        r: double
-        g: double
-        b: double
-        a: double
+        prop r: double
+        prop g: double
+        prop b: double
+        prop a: double
 
         r8: uint8
         g8: uint8

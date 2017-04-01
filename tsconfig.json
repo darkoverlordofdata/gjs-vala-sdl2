@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES6",
     "module": "amd",
     "rootDir": "src/js",
     "allowJs": true,
@@ -9,12 +9,10 @@
   "files": [
     "src/js/gobject-2.0.d.ts",
     "src/js/sdx.d.ts",
-    "src/js/gjs.d.ts",
-    "src/js/gjs.js",
+    "src/js/define.js",
     "src/js/global.js",
-    "src/js/entitas-ts.js",
-    "src/js/shim.ambient.js",
-    "src/js/shim.sdx.js",
+    "src/js/entitas.lib.js",
+    "src/js/entitas.shim.js",
     "src/js/components.ts",
     "src/js/extensions.ts",
     "src/js/shmupwarz.d.ts",

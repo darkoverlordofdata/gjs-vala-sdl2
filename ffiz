@@ -1,0 +1,212 @@
+#!/usr/bin/env coffee
+
+ffi = require 'ffi'
+ref = require 'ref'
+
+GObject = ref.types.void
+GObjectPtr = ref.refType(GObject)
+ObjectPtrPtr = ref.refType(GObjectPtr)
+#/**
+# * Sdx api
+# */
+sdx = ffi.Library 'sdx', 
+    sdx_createJsGame: [GObjectPtr, ['string', 'int', 'int', 'string'] ]
+    sdx_createSprite: [GObjectPtr, ['string'] ]
+    sdx_createAtlas: [GObjectPtr, ['string'] ]
+    sdx_createSound: [GObjectPtr, ['string'] ]
+    sdx_createFont: [GObjectPtr, ['string', 'int'] ]
+    sdx_createText: [GObjectPtr, ['string', GObjectPtr, GObjectPtr] ]
+    sdx_createColor: [GObjectPtr, ['double', 'double', 'double', 'double'] ]
+
+    sdx_audio_sound_play: ['void', [GObjectPtr, 'int']]
+
+    sdx_graphics_color_get_r: ['double', [GObjectPtr]]
+    sdx_graphics_color_set_r: ['void', [GObjectPtr, 'double']]
+    sdx_graphics_color_get_g: ['double', [GObjectPtr]]
+    sdx_graphics_color_set_g: ['void', [GObjectPtr, 'double']]
+    sdx_graphics_color_get_b: ['double', [GObjectPtr]]
+    sdx_graphics_color_set_b: ['void', [GObjectPtr, 'double']]
+    sdx_graphics_color_get_a: ['double', [GObjectPtr]]
+    sdx_graphics_color_set_a: ['void', [GObjectPtr, 'double']]
+    
+    sdx_graphics_color_get_RED: [GObjectPtr, []]
+
+    sdx_graphics_s2d_font_get_path: ['string', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_get_x: ['int', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_x: ['void', [GObjectPtr, 'int']]
+    sdx_graphics_s2d_sprite_get_y: ['int', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_y: ['void', [GObjectPtr, 'int']]
+    sdx_graphics_s2d_sprite_get_r: ['double', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_r: ['void', [GObjectPtr, 'double']]
+    sdx_graphics_s2d_sprite_get_g: ['double', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_g: ['void', [GObjectPtr, 'double']]
+    sdx_graphics_s2d_sprite_get_b: ['double', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_b: ['void', [GObjectPtr, 'double']]
+    sdx_graphics_s2d_sprite_get_a: ['double', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_a: ['void', [GObjectPtr, 'double']]
+    sdx_graphics_s2d_sprite_get_width: ['int', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_width: ['void', [GObjectPtr, 'int']]
+    sdx_graphics_s2d_sprite_get_height: ['int', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_height: ['void', [GObjectPtr, 'int']]
+    sdx_graphics_s2d_sprite_get_centered: ['bool', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_centered: ['void', [GObjectPtr, 'bool']]
+    sdx_graphics_s2d_sprite_get_layer: ['int', [GObjectPtr]]
+    sdx_graphics_s2d_sprite_set_layer: ['void', [GObjectPtr, 'int']]
+    sdx_graphics_s2d_sprite_setScale: ['void', [GObjectPtr, 'double', 'double']]
+    sdx_graphics_s2d_sprite_setColor: ['void', [GObjectPtr, 'double', 'double', 'double']]
+    sdx_graphics_s2d_sprite_setText: ['void', [GObjectPtr, 'string', GObjectPtr, GObjectPtr]]
+    sdx_graphics_s2d_texture_atlas_createSprite: [GObjectPtr, [GObjectPtr, 'string']]
+    sdx_js_game_start: ['void', [GObjectPtr]]
+    sdx_js_game_get_running: ['bool', [GObjectPtr]]
+    sdx_js_game_handleEvents: ['void', [GObjectPtr]]
+    sdx_js_game_getKey: ['bool', [GObjectPtr, 'int']]
+    sdx_js_game_draw: ['void', [GObjectPtr]]
+    sdx_js_game_get_profile: ['bool', [GObjectPtr]]
+    sdx_js_game_set_profile: ['void', [GObjectPtr, 'bool']]
+    sdx_js_game_get_mouse_x: ['int', [GObjectPtr]]
+    sdx_js_game_get_mouse_y: ['int', [GObjectPtr]]
+    sdx_js_game_get_mouse_down: ['bool', [GObjectPtr]]
+    sdx_js_game_get_show_fps: ['bool', [GObjectPtr]]
+    sdx_js_game_set_show_fps: ['void', [GObjectPtr], 'bool'],
+    sdx_js_game_get_delta_time: ['double', [GObjectPtr]]
+
+    
+
+Object.defineProperties sdx, 
+    createGame: value: (title, height, width, base) ->
+        game = sdx.sdx_createJsGame(title, height, width, base)
+        Object.defineProperties game, 
+            name:           get: () -> sdx.sdx_js_game_get_name(game)
+            base:           get: () -> sdx.sdx_js_game_get_base(game)
+            running:        get: () -> sdx.sdx_js_game_get_running(game)
+            profile:        get: () -> sdx.sdx_js_game_get_profile(game)
+                            set: (v) -> sdx.sdx_js_game_set_profile(game, v)
+            mouseX:         get: () -> sdx.sdx_js_game_get_mouse_x(game)
+            mouseY:         get: () -> sdx.sdx_js_game_get_mouse_y(game)
+            mouseDown:      get: () -> sdx.sdx_js_game_get_mouse_down(game)
+            showFps:        get: () -> sdx.sdx_js_game_get_show_fps(game)
+                            set: (v) -> sdx.sdx_js_game_set_show_fps(game, v)
+            deltaTime:      get: () -> sdx.sdx_js_game_get_delta_time(game)
+            start:          value: () -> sdx.sdx_js_game_start(game)
+            handleEvents:   value: () -> sdx.sdx_js_game_handleEvents(game)
+            getKey:         value: (key) -> sdx.sdx_js_game_getKey(game, key)
+            draw:           value: () -> sdx.sdx_js_game_draw(game)
+            addSprite:      value: (sprite) -> sdx.sdx_js_game_draw(game, sprite)
+            addOnce:        value: (sprite) -> sdx.sdx_js_game_draw(game, sprite)
+            removeSprite:   value: (sprite) -> sdx.sdx_js_game_draw(game, sprite)
+        
+        game
+    
+    createSprite: value: (path) ->
+        sprite = sdx.sdx_createSprite(path)
+        Object.defineProperties sprite, 
+            x:          get: () -> sdx.sdx_graphics_s2d_sprite_get_x(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_x(sprite, v) 
+            y:          get: () -> sdx.sdx_graphics_s2d_sprite_get_y(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_y(sprite, v) 
+            r:          get: () -> sdx.sdx_graphics_s2d_sprite_get_r(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_r(sprite, v) 
+            g:          get: () -> sdx.sdx_graphics_s2d_sprite_get_g(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_g(sprite, v) 
+            b:          get: () -> sdx.sdx_graphics_s2d_sprite_get_b(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_b(sprite, v) 
+            a:          get: () -> sdx.sdx_graphics_s2d_sprite_get_a(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_a(sprite, v) 
+            width:      get: () -> sdx.sdx_graphics_s2d_sprite_get_width(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_width(sprite, v) 
+            height:     get: () -> sdx.sdx_graphics_s2d_sprite_get_height(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_height(sprite, v) 
+            centered:   get: () -> sdx.sdx_graphics_s2d_sprite_get_centered(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_centered(sprite, v) 
+            layer:      get: () -> sdx.sdx_graphics_s2d_sprite_get_layer(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_layer(sprite, v) 
+            setScale:   value: (x, y) -> sdx.sdx_graphics_s2d_sprite_setScale(sprite, x, y) 
+            setColor:   value: (r, g, b) -> sdx.sdx_graphics_s2d_sprite_setColor(sprite, r, g, b) 
+            setText:    value: (str, font, color) -> sdx.sdx_graphics_s2d_sprite_setText(sprite, str, font, color) 
+        
+        sprite
+    
+    createAtlas: value: (path) ->
+        atlas = sdx.sdx_createAtlas(path)
+        Object.defineProperties atlas, 
+            createSprite:   value: (path, index) -> sdx.sdx_graphics_s2d_texture_atlas_createSprite(atlas, path, index) 
+        
+        atlas
+    
+    createSound: value: (path) ->
+        sound = sdx.sdx_createSound(path)
+        Object.defineProperties sound, 
+            play:       value: (l) -> sdx.sdx_audio_sound_play(sound, l) 
+        
+        sound
+    
+    createFont: value: (path, size) ->
+        font = sdx.sdx_createFont(path, size)
+        Object.defineProperties font, 
+            path:       get: () -> sdx.sdx_graphics_s2d_font_get_path(font)
+        
+        font
+    
+    createText: value: (text, font, color) ->
+        sprite = sdx.sdx_createText(text, font, color)
+        Object.defineProperties sprite, 
+            x:          get: () -> sdx.sdx_graphics_s2d_sprite_get_x(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_x(sprite, v) 
+            y:          get: () -> sdx.sdx_graphics_s2d_sprite_get_y(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_y(sprite, v) 
+            r:          get: () -> sdx.sdx_graphics_s2d_sprite_get_r(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_r(sprite, v) 
+            g:          get: () -> sdx.sdx_graphics_s2d_sprite_get_g(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_g(sprite, v) 
+            b:          get: () -> sdx.sdx_graphics_s2d_sprite_get_b(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_b(sprite, v) 
+            a:          get: () -> sdx.sdx_graphics_s2d_sprite_get_a(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_a(sprite, v) 
+            width:      get: () -> sdx.sdx_graphics_s2d_sprite_get_width(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_width(sprite, v) 
+            height:     get: () -> sdx.sdx_graphics_s2d_sprite_get_height(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_height(sprite, v) 
+            centered:   get: () -> sdx.sdx_graphics_s2d_sprite_get_centered(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_centered(sprite, v) 
+            layer:      get: () -> sdx.sdx_graphics_s2d_sprite_get_layer(sprite)
+                        set: (v) -> sdx.sdx_graphics_s2d_sprite_set_layer(sprite, v) 
+            setScale:   value: (x, y) -> sdx.sdx_graphics_s2d_sprite_setScale(sprite, x, y) 
+            setColor:   value: (r, g, b) -> sdx.sdx_graphics_s2d_sprite_setColor(sprite, r, g, b) 
+            setText:    value: (str, font, color) -> sdx.sdx_graphics_s2d_sprite_setText(sprite, str, font, color) 
+        
+        sprite
+    
+    createColor: value: (r, g, b, a) ->
+        color = sdx.sdx_createColor(r, g, b, a)
+        Object.defineProperties color, 
+            r:  get: () -> sdx.sdx_graphics_color_get_r(color)
+                set: (v) -> sdx.sdx_graphics_color_set_r(color, v) 
+            g:  get: () -> sdx.sdx_graphics_color_get_g(color)
+                set: (v) -> sdx.sdx_graphics_color_set_g(color, v) 
+            b:  get: () -> sdx.sdx_graphics_color_get_b(color)
+                set: (v) -> sdx.sdx_graphics_color_set_b(color, v) 
+            a:  get: () -> sdx.sdx_graphics_color_get_a(color)
+                set: (v) -> sdx.sdx_graphics_color_set_a(color, v) 
+        
+        color
+    
+    graphics:   value: {} 
+
+Object.defineProperties sdx.graphics, 
+    color:      value: {} 
+
+Object.defineProperties sdx.graphics.color, 
+    RED:        get: () -> sdx.sdx_graphics_color_get_RED() 
+    LIME:       get: () -> sdx.sdx_graphics_color_get_LIME() 
+
+
+game = sdx.createGame("Frodo", 400, 600, "/home/bruce/gjs/gjs-vala-sdl2/data/")
+game.start()
+game.profile = true
+while game.running
+    game.handleEvents()
+    if game.getKey(27) then break
+    else game.draw()
+    
+
+

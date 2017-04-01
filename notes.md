@@ -9,6 +9,7 @@ javascript to the framework.
 
 Default arguments are lost, and must be supplied by javascript
 
+Gir:
 Camel case properties don't work. Properties must be snake case for script access.
 
 Enums and constants can't be calulated, can't have lower case. Can't be nested.
@@ -17,32 +18,17 @@ So I need to redefine for javascript.
 
 ## performance
 
-preliminary profiling looks pretty good, 
-
-    0.001322
-    0.001774
-    0.001792
-    0.001430
-    0.001758
-    0.001537
-
-compared to:
-
-    gjs-vala        0.001602
-    fsharp          0.001651
-    scala-native    0.001812
-    ooc             0.002586
-    nim             0.003331	
-    vala	        0.003586	
-    scala-jvm       0.008185	
+using gir/gjs, performance is about 20% slower
+using node/ffi, performance is picks back up, about the same as pure vala.
 
 
-## why?
+## node or gjs?
 
-Why is it faster than a pure vala solution?
+this is a no brainer - node:
 
-* Game logic is pojs, which is I assume less overhead than GObject
-* SpiderMonkey is a Mozilla flagship product. I assume it's better at optimization than valac.
-* JS code is much more simple. Less code runs faster is especially true for JS.
 
-It allows me to dramatically increase the activity level of the game - this is a game changer.
+* node has monumentally more resources than gjs
+* node has es6
+* node has better performance
+* node-ffi is ad-hoc, gir requires alot of setup
+* node works on windows, gjs does not

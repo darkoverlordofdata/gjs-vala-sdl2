@@ -3,7 +3,9 @@
 gjs-vala-sdl2
 
 inspired by libGDX, but wraps SDL2 rather than OpenGL
-callable from gjs
+callable from gjs via gir or node via ffi.
+
+
 
 ## install
 

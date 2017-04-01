@@ -1,59 +1,34 @@
-/**
- *  Copyright 2017 darkoverlordofdata
- *
- * Simple module loader/gjs helper
- * normalized access to amd, commonjs and gjs imports
- *
- */
-Object.defineProperties(window, {
+#!/usr/bin/env node
+require('coffee-script/register');
+Object.defineProperties(global, {
     define: { value: (function (modules) {
-            return function (name, deps, callback) {
+            return (name, deps, callback) => {
                 if (typeof name !== 'string') {
-                    var bundle = deps();
+                    const bundle = deps();
                     for (name in bundle)
                         modules[name] = { id: name, exports: bundle[name] };
                 }
                 else {
                     modules[name] = { id: name, exports: {} };
-                    var args = [function (name) { return modules[name] ? modules[name].exports : imports[name]; },
+                    const args = [(name) => modules[name] ? modules[name].exports : require(name),
                         modules[name].exports];
-                    for (var i = 2; i < deps.length; i++)
+                    for (let i = 2; i < deps.length; i++)
                         args.push(modules[deps[i]].exports);
                     callback.apply(modules[name].exports, args);
                 }
             };
         }({
-            Lang: { id: 'Lang', exports: imports.lang },
-            Sdx: { id: 'Sdx', exports: imports.gi.sdx },
-            Gio: { id: 'Gio', exports: imports.gi.Gio },
-            Atk: { id: 'Atk', exports: imports.gi.Atk },
-            Gdk: { id: 'Gdk', exports: imports.gi.Gdk },
-            Gtk: { id: 'Gtk', exports: imports.gi.Gtk },
-            GLib: { id: 'GLib', exports: imports.gi.GLib },
-            Pango: { id: 'Pango', exports: imports.gi.Pango },
-            GObject: { id: 'GObject', exports: imports.gi.GObject }
-        })) },
-    console: { value: {
-            log: function () { print.apply(null, arguments); },
-            warn: function () { print.apply(null, arguments); },
-            error: function () { print.apply(null, arguments); },
-            info: function () { print.apply(null, arguments); }
-        } },
-    _: { value: imports.gettext.gettext }
+            Sdx: { id: 'Sdx', exports: require('./sdx') }
+        })) }
 });
 Object.defineProperties(define, {
     amd: { value: true },
     version: { value: '0.1.0' },
-    path: { value: function (path) { return imports.searchPath.unshift(path); } },
-    imports: { value: function (libs) { return define([], function () { return libs; }); } }
-});
-Object.defineProperties(String.prototype, {
-    printf: { value: imports.format.format }
 });
 /**
  * Global constants
  */
-var DATADIR = '/home/bruce/gjs/gjs-vala-sdl2/data';
+const DATADIR = '/home/bruce/gjs/gjs-vala-sdl2/data';
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b)
         if (b.hasOwnProperty(p))
@@ -2518,113 +2493,12 @@ var entitas;
  * Shim to import ambient modules
  */
 entitas['entitas'] = entitas;
-define.imports({
-    'entitas': entitas,
-    'entitas.utils': entitas.utils,
-    'entitas.exceptions': entitas.exceptions
-});
-define("shim.sdx", ["require", "exports", "Sdx"], function (require, exports, sdx) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    Object.defineProperties(sdx, {
-        createGame: { value: function (t, h, w, b) {
-                var g = sdx.createJsGame(t, h, w, b);
-                // fix some camel case property names
-                Object.defineProperties(g, {
-                    mouseX: { get: function () { return g.get_mouse_x(); } },
-                    mouseY: { get: function () { return g.get_mouse_y(); } },
-                    mouseDown: { get: function () { return g.get_mouse_down(); } },
-                    showFps: { get: function () { return g.get_show_fps(); } },
-                    deltaTime: { get: function () { return g.get_delta_time(); } }
-                });
-                Object.defineProperties(sdx.Sdx.graphics, {
-                    deltaTime: { get: function () { return sdx.Sdx.graphics.get_deltaTime(); } },
-                    pixelFactor: { get: function () { return sdx.Sdx.graphics.get_pixelFactor(); } }
-                });
-                Object.defineProperties(sdx.Sdx.files, {
-                    isResource: { get: function () { return sdx.Sdx.files.get_isResource(); } },
-                    resourcePath: { get: function () { return sdx.Sdx.files.get_resourcePath(); } }
-                });
-                return g;
-            } }
-    });
-    // fix some static property names
-    Object.defineProperties(sdx.Sdx, {
-        app: { get: function () { return sdx.Sdx.get_app(); } },
-        graphics: { get: function () { return sdx.Sdx.get_graphics(); } },
-        audio: { get: function () { return sdx.Sdx.get_audio(); } },
-        input: { get: function () { return sdx.Sdx.get_input(); } },
-        files: { get: function () { return sdx.Sdx.get_files(); } }
-    });
-    // fix enums
-    Object.defineProperties(sdx, { graphics: { value: {} } });
-    Object.defineProperties(sdx.graphics, { Color: { value: {} } });
-    Object.defineProperties(sdx.graphics.Color, {
-        CLEAR: { get: function () { return sdx.graphicsColor.get_CLEAR(); } },
-        BLACK: { get: function () { return sdx.graphicsColor.get_BLACK(); } },
-        WHITE: { get: function () { return sdx.graphicsColor.get_WHITE(); } },
-        LIGHT_GRAY: { get: function () { return sdx.graphicsColor.get_LIGHT_GRAY(); } },
-        GRAY: { get: function () { return sdx.graphicsColor.get_GRAY(); } },
-        DARK_GRAY: { get: function () { return sdx.graphicsColor.get_DARK_GRAY(); } },
-        BLUE: { get: function () { return sdx.graphicsColor.get_BLUE(); } },
-        NAVY: { get: function () { return sdx.graphicsColor.get_NAVY(); } },
-        ROYAL: { get: function () { return sdx.graphicsColor.get_ROYAL(); } },
-        SLATE: { get: function () { return sdx.graphicsColor.get_SLATE(); } },
-        SKY: { get: function () { return sdx.graphicsColor.get_SKY(); } },
-        CYAN: { get: function () { return sdx.graphicsColor.get_CYAN(); } },
-        TEAL: { get: function () { return sdx.graphicsColor.get_TEAL(); } },
-        GREEN: { get: function () { return sdx.graphicsColor.get_GREEN(); } },
-        CHARTREUSE: { get: function () { return sdx.graphicsColor.get_CHARTREUSE(); } },
-        LIME: { get: function () { return sdx.graphicsColor.get_LIME(); } },
-        FOREST: { get: function () { return sdx.graphicsColor.get_FOREST(); } },
-        OLIVE: { get: function () { return sdx.graphicsColor.get_OLIVE(); } },
-        YELLOW: { get: function () { return sdx.graphicsColor.get_YELLOW(); } },
-        GOLD: { get: function () { return sdx.graphicsColor.get_GOLD(); } },
-        GOLDENROD: { get: function () { return sdx.graphicsColor.get_GOLDENROD(); } },
-        ORANGE: { get: function () { return sdx.graphicsColor.get_ORANGE(); } },
-        BROWN: { get: function () { return sdx.graphicsColor.get_BROWN(); } },
-        TAN: { get: function () { return sdx.graphicsColor.get_TAN(); } },
-        FIREBRICK: { get: function () { return sdx.graphicsColor.get_FIREBRICK(); } },
-        RED: { get: function () { return sdx.graphicsColor.get_RED(); } },
-        SCARLET: { get: function () { return sdx.graphicsColor.get_SCARLET(); } },
-        SALMON: { get: function () { return sdx.graphicsColor.get_SALMON(); } },
-        PINK: { get: function () { return sdx.graphicsColor.get_PINK(); } },
-        MAGENTA: { get: function () { return sdx.graphicsColor.get_MAGENTA(); } },
-        PURPLE: { get: function () { return sdx.graphicsColor.get_PURPLE(); } },
-        VIOLET: { get: function () { return sdx.graphicsColor.get_VIOLET(); } },
-        MAROON: { get: function () { return sdx.graphicsColor.get_MAROON(); } }
-    });
-    Object.defineProperties(sdx.Input, {
-        Keys: { value: {
-                Esc: 27,
-                a: 97,
-                b: 98,
-                c: 99,
-                d: 100,
-                e: 101,
-                f: 102,
-                g: 103,
-                h: 104,
-                i: 105,
-                j: 106,
-                k: 107,
-                l: 108,
-                m: 109,
-                n: 110,
-                o: 111,
-                p: 112,
-                q: 113,
-                r: 114,
-                s: 115,
-                t: 116,
-                u: 117,
-                v: 118,
-                w: 119,
-                x: 120,
-                y: 121,
-                z: 122
-            } }
-    });
+define([], () => {
+    return {
+        'entitas': entitas,
+        'entitas.utils': entitas.utils,
+        'entitas.exceptions': entitas.exceptions
+    };
 });
 define("components", ["require", "exports", "entitas", "entitas", "entitas", "entitas.exceptions", "entitas.utils"], function (require, exports, entitas_1, entitas_2, entitas_3, entitas_exceptions_1, entitas_utils_1) {
     "use strict";
@@ -2654,151 +2528,80 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
         CoreComponentIds[CoreComponentIds["TotalComponents"] = 20] = "TotalComponents";
     })(CoreComponentIds = exports.CoreComponentIds || (exports.CoreComponentIds = {}));
     entitas_2.Entity.initialize(CoreComponentIds.TotalComponents, { "entities": 200, "components": 128 });
-    var BoundsComponent = (function () {
-        function BoundsComponent() {
-        }
-        return BoundsComponent;
-    }());
+    class BoundsComponent {
+    }
     exports.BoundsComponent = BoundsComponent;
-    var BulletComponent = (function () {
-        function BulletComponent() {
-        }
-        return BulletComponent;
-    }());
+    class BulletComponent {
+    }
     exports.BulletComponent = BulletComponent;
-    var ColorAnimationComponent = (function () {
-        function ColorAnimationComponent() {
-        }
-        return ColorAnimationComponent;
-    }());
+    class ColorAnimationComponent {
+    }
     exports.ColorAnimationComponent = ColorAnimationComponent;
-    var EnemyComponent = (function () {
-        function EnemyComponent() {
-        }
-        return EnemyComponent;
-    }());
+    class EnemyComponent {
+    }
     exports.EnemyComponent = EnemyComponent;
-    var ExpiresComponent = (function () {
-        function ExpiresComponent() {
-        }
-        return ExpiresComponent;
-    }());
+    class ExpiresComponent {
+    }
     exports.ExpiresComponent = ExpiresComponent;
-    var FiringComponent = (function () {
-        function FiringComponent() {
-        }
-        return FiringComponent;
-    }());
+    class FiringComponent {
+    }
     exports.FiringComponent = FiringComponent;
-    var HealthComponent = (function () {
-        function HealthComponent() {
-        }
-        return HealthComponent;
-    }());
+    class HealthComponent {
+    }
     exports.HealthComponent = HealthComponent;
-    var ParallaxStarComponent = (function () {
-        function ParallaxStarComponent() {
-        }
-        return ParallaxStarComponent;
-    }());
+    class ParallaxStarComponent {
+    }
     exports.ParallaxStarComponent = ParallaxStarComponent;
-    var PlayerComponent = (function () {
-        function PlayerComponent() {
-        }
-        return PlayerComponent;
-    }());
+    class PlayerComponent {
+    }
     exports.PlayerComponent = PlayerComponent;
-    var PositionComponent = (function () {
-        function PositionComponent() {
-        }
-        return PositionComponent;
-    }());
+    class PositionComponent {
+    }
     exports.PositionComponent = PositionComponent;
-    var ScaleAnimationComponent = (function () {
-        function ScaleAnimationComponent() {
-        }
-        return ScaleAnimationComponent;
-    }());
+    class ScaleAnimationComponent {
+    }
     exports.ScaleAnimationComponent = ScaleAnimationComponent;
-    var SoundEffectComponent = (function () {
-        function SoundEffectComponent() {
-        }
-        return SoundEffectComponent;
-    }());
+    class SoundEffectComponent {
+    }
     exports.SoundEffectComponent = SoundEffectComponent;
-    var SpriteComponent = (function () {
-        function SpriteComponent() {
-        }
-        return SpriteComponent;
-    }());
+    class SpriteComponent {
+    }
     exports.SpriteComponent = SpriteComponent;
-    var VelocityComponent = (function () {
-        function VelocityComponent() {
-        }
-        return VelocityComponent;
-    }());
+    class VelocityComponent {
+    }
     exports.VelocityComponent = VelocityComponent;
-    var ScoreComponent = (function () {
-        function ScoreComponent() {
-        }
-        return ScoreComponent;
-    }());
+    class ScoreComponent {
+    }
     exports.ScoreComponent = ScoreComponent;
-    var DestroyComponent = (function () {
-        function DestroyComponent() {
-        }
-        return DestroyComponent;
-    }());
+    class DestroyComponent {
+    }
     exports.DestroyComponent = DestroyComponent;
-    var MouseComponent = (function () {
-        function MouseComponent() {
-        }
-        return MouseComponent;
-    }());
+    class MouseComponent {
+    }
     exports.MouseComponent = MouseComponent;
-    var ScaleComponent = (function () {
-        function ScaleComponent() {
-        }
-        return ScaleComponent;
-    }());
+    class ScaleComponent {
+    }
     exports.ScaleComponent = ScaleComponent;
-    var ResourceComponent = (function () {
-        function ResourceComponent() {
-        }
-        return ResourceComponent;
-    }());
+    class ResourceComponent {
+    }
     exports.ResourceComponent = ResourceComponent;
-    var LayerComponent = (function () {
-        function LayerComponent() {
-        }
-        return LayerComponent;
-    }());
+    class LayerComponent {
+    }
     exports.LayerComponent = LayerComponent;
-    var Pools = (function () {
-        function Pools() {
+    class Pools {
+        static get allPools() {
+            if (Pools._allPools == null) {
+                Pools._allPools = [Pools.pool];
+            }
+            return Pools._allPools;
         }
-        Object.defineProperty(Pools, "allPools", {
-            get: function () {
-                if (Pools._allPools == null) {
-                    Pools._allPools = [Pools.pool];
-                }
-                return Pools._allPools;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Pools, "pool", {
-            get: function () {
-                if (Pools._pool == null) {
-                    Pools._pool = new entitas_1.Pool(CoreComponentIds, CoreComponentIds.TotalComponents, false);
-                }
-                return Pools._pool;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return Pools;
-    }());
+        static get pool() {
+            if (Pools._pool == null) {
+                Pools._pool = new entitas_1.Pool(CoreComponentIds, CoreComponentIds.TotalComponents, false);
+            }
+            return Pools._pool;
+        }
+    }
     exports.Pools = Pools;
     /**
     * Entity extensions
@@ -2807,7 +2610,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._boundsComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._boundsComponentPool.add(new BoundsComponent());
         }
     })();
@@ -2831,7 +2634,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addBounds = function (radius) {
-        var component = entitas_2.Entity._boundsComponentPool.size() > 0 ? entitas_2.Entity._boundsComponentPool.removeLast() : new BoundsComponent();
+        let component = entitas_2.Entity._boundsComponentPool.size() > 0 ? entitas_2.Entity._boundsComponentPool.removeLast() : new BoundsComponent();
         component.radius = radius;
         this.addComponent(CoreComponentIds.Bounds, component);
         return this;
@@ -2841,8 +2644,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceBounds = function (radius) {
-        var previousComponent = this.hasBounds ? this.bounds : null;
-        var component = entitas_2.Entity._boundsComponentPool.size() > 0 ? entitas_2.Entity._boundsComponentPool.removeLast() : new BoundsComponent();
+        let previousComponent = this.hasBounds ? this.bounds : null;
+        let component = entitas_2.Entity._boundsComponentPool.size() > 0 ? entitas_2.Entity._boundsComponentPool.removeLast() : new BoundsComponent();
         component.radius = radius;
         this.replaceComponent(CoreComponentIds.Bounds, component);
         if (previousComponent != null) {
@@ -2854,7 +2657,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeBounds = function () {
-        var component = this.bounds;
+        let component = this.bounds;
         this.removeComponent(CoreComponentIds.Bounds);
         entitas_2.Entity._boundsComponentPool.add(component);
         return this;
@@ -2890,7 +2693,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._colorAnimationComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._colorAnimationComponentPool.add(new ColorAnimationComponent());
         }
     })();
@@ -2930,7 +2733,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addColorAnimation = function (redMin, redMax, redSpeed, greenMin, greenMax, greenSpeed, blueMin, blueMax, blueSpeed, alphaMin, alphaMax, alphaSpeed, redAnimate, greenAnimate, blueAnimate, alphaAnimate, repeat) {
-        var component = entitas_2.Entity._colorAnimationComponentPool.size() > 0 ? entitas_2.Entity._colorAnimationComponentPool.removeLast() : new ColorAnimationComponent();
+        let component = entitas_2.Entity._colorAnimationComponentPool.size() > 0 ? entitas_2.Entity._colorAnimationComponentPool.removeLast() : new ColorAnimationComponent();
         component.redMin = redMin;
         component.redMax = redMax;
         component.redSpeed = redSpeed;
@@ -2972,8 +2775,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceColorAnimation = function (redMin, redMax, redSpeed, greenMin, greenMax, greenSpeed, blueMin, blueMax, blueSpeed, alphaMin, alphaMax, alphaSpeed, redAnimate, greenAnimate, blueAnimate, alphaAnimate, repeat) {
-        var previousComponent = this.hasColorAnimation ? this.colorAnimation : null;
-        var component = entitas_2.Entity._colorAnimationComponentPool.size() > 0 ? entitas_2.Entity._colorAnimationComponentPool.removeLast() : new ColorAnimationComponent();
+        let previousComponent = this.hasColorAnimation ? this.colorAnimation : null;
+        let component = entitas_2.Entity._colorAnimationComponentPool.size() > 0 ? entitas_2.Entity._colorAnimationComponentPool.removeLast() : new ColorAnimationComponent();
         component.redMin = redMin;
         component.redMax = redMax;
         component.redSpeed = redSpeed;
@@ -3001,7 +2804,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeColorAnimation = function () {
-        var component = this.colorAnimation;
+        let component = this.colorAnimation;
         this.removeComponent(CoreComponentIds.ColorAnimation);
         entitas_2.Entity._colorAnimationComponentPool.add(component);
         return this;
@@ -3037,7 +2840,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._expiresComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._expiresComponentPool.add(new ExpiresComponent());
         }
     })();
@@ -3061,7 +2864,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addExpires = function (delay) {
-        var component = entitas_2.Entity._expiresComponentPool.size() > 0 ? entitas_2.Entity._expiresComponentPool.removeLast() : new ExpiresComponent();
+        let component = entitas_2.Entity._expiresComponentPool.size() > 0 ? entitas_2.Entity._expiresComponentPool.removeLast() : new ExpiresComponent();
         component.delay = delay;
         this.addComponent(CoreComponentIds.Expires, component);
         return this;
@@ -3071,8 +2874,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceExpires = function (delay) {
-        var previousComponent = this.hasExpires ? this.expires : null;
-        var component = entitas_2.Entity._expiresComponentPool.size() > 0 ? entitas_2.Entity._expiresComponentPool.removeLast() : new ExpiresComponent();
+        let previousComponent = this.hasExpires ? this.expires : null;
+        let component = entitas_2.Entity._expiresComponentPool.size() > 0 ? entitas_2.Entity._expiresComponentPool.removeLast() : new ExpiresComponent();
         component.delay = delay;
         this.replaceComponent(CoreComponentIds.Expires, component);
         if (previousComponent != null) {
@@ -3084,7 +2887,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeExpires = function () {
-        var component = this.expires;
+        let component = this.expires;
         this.removeComponent(CoreComponentIds.Expires);
         entitas_2.Entity._expiresComponentPool.add(component);
         return this;
@@ -3120,7 +2923,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._healthComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._healthComponentPool.add(new HealthComponent());
         }
     })();
@@ -3145,7 +2948,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addHealth = function (health, maximumHealth) {
-        var component = entitas_2.Entity._healthComponentPool.size() > 0 ? entitas_2.Entity._healthComponentPool.removeLast() : new HealthComponent();
+        let component = entitas_2.Entity._healthComponentPool.size() > 0 ? entitas_2.Entity._healthComponentPool.removeLast() : new HealthComponent();
         component.health = health;
         component.maximumHealth = maximumHealth;
         this.addComponent(CoreComponentIds.Health, component);
@@ -3157,8 +2960,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceHealth = function (health, maximumHealth) {
-        var previousComponent = this.hasHealth ? this.health : null;
-        var component = entitas_2.Entity._healthComponentPool.size() > 0 ? entitas_2.Entity._healthComponentPool.removeLast() : new HealthComponent();
+        let previousComponent = this.hasHealth ? this.health : null;
+        let component = entitas_2.Entity._healthComponentPool.size() > 0 ? entitas_2.Entity._healthComponentPool.removeLast() : new HealthComponent();
         component.health = health;
         component.maximumHealth = maximumHealth;
         this.replaceComponent(CoreComponentIds.Health, component);
@@ -3171,7 +2974,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeHealth = function () {
-        var component = this.health;
+        let component = this.health;
         this.removeComponent(CoreComponentIds.Health);
         entitas_2.Entity._healthComponentPool.add(component);
         return this;
@@ -3234,7 +3037,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._positionComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._positionComponentPool.add(new PositionComponent());
         }
     })();
@@ -3259,7 +3062,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addPosition = function (x, y) {
-        var component = entitas_2.Entity._positionComponentPool.size() > 0 ? entitas_2.Entity._positionComponentPool.removeLast() : new PositionComponent();
+        let component = entitas_2.Entity._positionComponentPool.size() > 0 ? entitas_2.Entity._positionComponentPool.removeLast() : new PositionComponent();
         component.x = x;
         component.y = y;
         this.addComponent(CoreComponentIds.Position, component);
@@ -3271,8 +3074,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replacePosition = function (x, y) {
-        var previousComponent = this.hasPosition ? this.position : null;
-        var component = entitas_2.Entity._positionComponentPool.size() > 0 ? entitas_2.Entity._positionComponentPool.removeLast() : new PositionComponent();
+        let previousComponent = this.hasPosition ? this.position : null;
+        let component = entitas_2.Entity._positionComponentPool.size() > 0 ? entitas_2.Entity._positionComponentPool.removeLast() : new PositionComponent();
         component.x = x;
         component.y = y;
         this.replaceComponent(CoreComponentIds.Position, component);
@@ -3285,7 +3088,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removePosition = function () {
-        var component = this.position;
+        let component = this.position;
         this.removeComponent(CoreComponentIds.Position);
         entitas_2.Entity._positionComponentPool.add(component);
         return this;
@@ -3294,7 +3097,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._scaleAnimationComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._scaleAnimationComponentPool.add(new ScaleAnimationComponent());
         }
     })();
@@ -3322,7 +3125,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addScaleAnimation = function (min, max, speed, repeat, active) {
-        var component = entitas_2.Entity._scaleAnimationComponentPool.size() > 0 ? entitas_2.Entity._scaleAnimationComponentPool.removeLast() : new ScaleAnimationComponent();
+        let component = entitas_2.Entity._scaleAnimationComponentPool.size() > 0 ? entitas_2.Entity._scaleAnimationComponentPool.removeLast() : new ScaleAnimationComponent();
         component.min = min;
         component.max = max;
         component.speed = speed;
@@ -3340,8 +3143,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceScaleAnimation = function (min, max, speed, repeat, active) {
-        var previousComponent = this.hasScaleAnimation ? this.scaleAnimation : null;
-        var component = entitas_2.Entity._scaleAnimationComponentPool.size() > 0 ? entitas_2.Entity._scaleAnimationComponentPool.removeLast() : new ScaleAnimationComponent();
+        let previousComponent = this.hasScaleAnimation ? this.scaleAnimation : null;
+        let component = entitas_2.Entity._scaleAnimationComponentPool.size() > 0 ? entitas_2.Entity._scaleAnimationComponentPool.removeLast() : new ScaleAnimationComponent();
         component.min = min;
         component.max = max;
         component.speed = speed;
@@ -3357,7 +3160,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeScaleAnimation = function () {
-        var component = this.scaleAnimation;
+        let component = this.scaleAnimation;
         this.removeComponent(CoreComponentIds.ScaleAnimation);
         entitas_2.Entity._scaleAnimationComponentPool.add(component);
         return this;
@@ -3366,7 +3169,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._soundEffectComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._soundEffectComponentPool.add(new SoundEffectComponent());
         }
     })();
@@ -3390,7 +3193,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addSoundEffect = function (effect) {
-        var component = entitas_2.Entity._soundEffectComponentPool.size() > 0 ? entitas_2.Entity._soundEffectComponentPool.removeLast() : new SoundEffectComponent();
+        let component = entitas_2.Entity._soundEffectComponentPool.size() > 0 ? entitas_2.Entity._soundEffectComponentPool.removeLast() : new SoundEffectComponent();
         component.effect = effect;
         this.addComponent(CoreComponentIds.SoundEffect, component);
         return this;
@@ -3400,8 +3203,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceSoundEffect = function (effect) {
-        var previousComponent = this.hasSoundEffect ? this.soundEffect : null;
-        var component = entitas_2.Entity._soundEffectComponentPool.size() > 0 ? entitas_2.Entity._soundEffectComponentPool.removeLast() : new SoundEffectComponent();
+        let previousComponent = this.hasSoundEffect ? this.soundEffect : null;
+        let component = entitas_2.Entity._soundEffectComponentPool.size() > 0 ? entitas_2.Entity._soundEffectComponentPool.removeLast() : new SoundEffectComponent();
         component.effect = effect;
         this.replaceComponent(CoreComponentIds.SoundEffect, component);
         if (previousComponent != null) {
@@ -3413,7 +3216,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeSoundEffect = function () {
-        var component = this.soundEffect;
+        let component = this.soundEffect;
         this.removeComponent(CoreComponentIds.SoundEffect);
         entitas_2.Entity._soundEffectComponentPool.add(component);
         return this;
@@ -3422,7 +3225,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._spriteComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._spriteComponentPool.add(new SpriteComponent());
         }
     })();
@@ -3447,7 +3250,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addSprite = function (layer, object) {
-        var component = entitas_2.Entity._spriteComponentPool.size() > 0 ? entitas_2.Entity._spriteComponentPool.removeLast() : new SpriteComponent();
+        let component = entitas_2.Entity._spriteComponentPool.size() > 0 ? entitas_2.Entity._spriteComponentPool.removeLast() : new SpriteComponent();
         component.layer = layer;
         component.object = object;
         this.addComponent(CoreComponentIds.Sprite, component);
@@ -3459,8 +3262,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceSprite = function (layer, object) {
-        var previousComponent = this.hasSprite ? this.sprite : null;
-        var component = entitas_2.Entity._spriteComponentPool.size() > 0 ? entitas_2.Entity._spriteComponentPool.removeLast() : new SpriteComponent();
+        let previousComponent = this.hasSprite ? this.sprite : null;
+        let component = entitas_2.Entity._spriteComponentPool.size() > 0 ? entitas_2.Entity._spriteComponentPool.removeLast() : new SpriteComponent();
         component.layer = layer;
         component.object = object;
         this.replaceComponent(CoreComponentIds.Sprite, component);
@@ -3473,7 +3276,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeSprite = function () {
-        var component = this.sprite;
+        let component = this.sprite;
         this.removeComponent(CoreComponentIds.Sprite);
         entitas_2.Entity._spriteComponentPool.add(component);
         return this;
@@ -3482,7 +3285,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._velocityComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._velocityComponentPool.add(new VelocityComponent());
         }
     })();
@@ -3507,7 +3310,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addVelocity = function (x, y) {
-        var component = entitas_2.Entity._velocityComponentPool.size() > 0 ? entitas_2.Entity._velocityComponentPool.removeLast() : new VelocityComponent();
+        let component = entitas_2.Entity._velocityComponentPool.size() > 0 ? entitas_2.Entity._velocityComponentPool.removeLast() : new VelocityComponent();
         component.x = x;
         component.y = y;
         this.addComponent(CoreComponentIds.Velocity, component);
@@ -3519,8 +3322,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceVelocity = function (x, y) {
-        var previousComponent = this.hasVelocity ? this.velocity : null;
-        var component = entitas_2.Entity._velocityComponentPool.size() > 0 ? entitas_2.Entity._velocityComponentPool.removeLast() : new VelocityComponent();
+        let previousComponent = this.hasVelocity ? this.velocity : null;
+        let component = entitas_2.Entity._velocityComponentPool.size() > 0 ? entitas_2.Entity._velocityComponentPool.removeLast() : new VelocityComponent();
         component.x = x;
         component.y = y;
         this.replaceComponent(CoreComponentIds.Velocity, component);
@@ -3533,7 +3336,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeVelocity = function () {
-        var component = this.velocity;
+        let component = this.velocity;
         this.removeComponent(CoreComponentIds.Velocity);
         entitas_2.Entity._velocityComponentPool.add(component);
         return this;
@@ -3542,7 +3345,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._scoreComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._scoreComponentPool.add(new ScoreComponent());
         }
     })();
@@ -3566,7 +3369,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addScore = function (value) {
-        var component = entitas_2.Entity._scoreComponentPool.size() > 0 ? entitas_2.Entity._scoreComponentPool.removeLast() : new ScoreComponent();
+        let component = entitas_2.Entity._scoreComponentPool.size() > 0 ? entitas_2.Entity._scoreComponentPool.removeLast() : new ScoreComponent();
         component.value = value;
         this.addComponent(CoreComponentIds.Score, component);
         return this;
@@ -3576,8 +3379,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceScore = function (value) {
-        var previousComponent = this.hasScore ? this.score : null;
-        var component = entitas_2.Entity._scoreComponentPool.size() > 0 ? entitas_2.Entity._scoreComponentPool.removeLast() : new ScoreComponent();
+        let previousComponent = this.hasScore ? this.score : null;
+        let component = entitas_2.Entity._scoreComponentPool.size() > 0 ? entitas_2.Entity._scoreComponentPool.removeLast() : new ScoreComponent();
         component.value = value;
         this.replaceComponent(CoreComponentIds.Score, component);
         if (previousComponent != null) {
@@ -3589,7 +3392,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeScore = function () {
-        var component = this.score;
+        let component = this.score;
         this.removeComponent(CoreComponentIds.Score);
         entitas_2.Entity._scoreComponentPool.add(component);
         return this;
@@ -3625,7 +3428,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._mouseComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._mouseComponentPool.add(new MouseComponent());
         }
     })();
@@ -3650,7 +3453,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addMouse = function (x, y) {
-        var component = entitas_2.Entity._mouseComponentPool.size() > 0 ? entitas_2.Entity._mouseComponentPool.removeLast() : new MouseComponent();
+        let component = entitas_2.Entity._mouseComponentPool.size() > 0 ? entitas_2.Entity._mouseComponentPool.removeLast() : new MouseComponent();
         component.x = x;
         component.y = y;
         this.addComponent(CoreComponentIds.Mouse, component);
@@ -3662,8 +3465,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceMouse = function (x, y) {
-        var previousComponent = this.hasMouse ? this.mouse : null;
-        var component = entitas_2.Entity._mouseComponentPool.size() > 0 ? entitas_2.Entity._mouseComponentPool.removeLast() : new MouseComponent();
+        let previousComponent = this.hasMouse ? this.mouse : null;
+        let component = entitas_2.Entity._mouseComponentPool.size() > 0 ? entitas_2.Entity._mouseComponentPool.removeLast() : new MouseComponent();
         component.x = x;
         component.y = y;
         this.replaceComponent(CoreComponentIds.Mouse, component);
@@ -3676,7 +3479,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeMouse = function () {
-        var component = this.mouse;
+        let component = this.mouse;
         this.removeComponent(CoreComponentIds.Mouse);
         entitas_2.Entity._mouseComponentPool.add(component);
         return this;
@@ -3685,7 +3488,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._scaleComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._scaleComponentPool.add(new ScaleComponent());
         }
     })();
@@ -3710,7 +3513,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addScale = function (x, y) {
-        var component = entitas_2.Entity._scaleComponentPool.size() > 0 ? entitas_2.Entity._scaleComponentPool.removeLast() : new ScaleComponent();
+        let component = entitas_2.Entity._scaleComponentPool.size() > 0 ? entitas_2.Entity._scaleComponentPool.removeLast() : new ScaleComponent();
         component.x = x;
         component.y = y;
         this.addComponent(CoreComponentIds.Scale, component);
@@ -3722,8 +3525,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceScale = function (x, y) {
-        var previousComponent = this.hasScale ? this.scale : null;
-        var component = entitas_2.Entity._scaleComponentPool.size() > 0 ? entitas_2.Entity._scaleComponentPool.removeLast() : new ScaleComponent();
+        let previousComponent = this.hasScale ? this.scale : null;
+        let component = entitas_2.Entity._scaleComponentPool.size() > 0 ? entitas_2.Entity._scaleComponentPool.removeLast() : new ScaleComponent();
         component.x = x;
         component.y = y;
         this.replaceComponent(CoreComponentIds.Scale, component);
@@ -3736,7 +3539,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeScale = function () {
-        var component = this.scale;
+        let component = this.scale;
         this.removeComponent(CoreComponentIds.Scale);
         entitas_2.Entity._scaleComponentPool.add(component);
         return this;
@@ -3745,7 +3548,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._resourceComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._resourceComponentPool.add(new ResourceComponent());
         }
     })();
@@ -3769,7 +3572,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addResource = function (name) {
-        var component = entitas_2.Entity._resourceComponentPool.size() > 0 ? entitas_2.Entity._resourceComponentPool.removeLast() : new ResourceComponent();
+        let component = entitas_2.Entity._resourceComponentPool.size() > 0 ? entitas_2.Entity._resourceComponentPool.removeLast() : new ResourceComponent();
         component.name = name;
         this.addComponent(CoreComponentIds.Resource, component);
         return this;
@@ -3779,8 +3582,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceResource = function (name) {
-        var previousComponent = this.hasResource ? this.resource : null;
-        var component = entitas_2.Entity._resourceComponentPool.size() > 0 ? entitas_2.Entity._resourceComponentPool.removeLast() : new ResourceComponent();
+        let previousComponent = this.hasResource ? this.resource : null;
+        let component = entitas_2.Entity._resourceComponentPool.size() > 0 ? entitas_2.Entity._resourceComponentPool.removeLast() : new ResourceComponent();
         component.name = name;
         this.replaceComponent(CoreComponentIds.Resource, component);
         if (previousComponent != null) {
@@ -3792,7 +3595,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeResource = function () {
-        var component = this.resource;
+        let component = this.resource;
         this.removeComponent(CoreComponentIds.Resource);
         entitas_2.Entity._resourceComponentPool.add(component);
         return this;
@@ -3801,7 +3604,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
     /** @type {entitas.utils.Bag} */
     entitas_2.Entity._layerComponentPool = new entitas_utils_1.Bag();
     (function () {
-        for (var i = 0; i < 128; i++) {
+        for (let i = 0; i < 128; i++) {
             entitas_2.Entity._layerComponentPool.add(new LayerComponent());
         }
     })();
@@ -3825,7 +3628,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.addLayer = function (ordinal) {
-        var component = entitas_2.Entity._layerComponentPool.size() > 0 ? entitas_2.Entity._layerComponentPool.removeLast() : new LayerComponent();
+        let component = entitas_2.Entity._layerComponentPool.size() > 0 ? entitas_2.Entity._layerComponentPool.removeLast() : new LayerComponent();
         component.ordinal = ordinal;
         this.addComponent(CoreComponentIds.Layer, component);
         return this;
@@ -3835,8 +3638,8 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
       * @return entitas.Entity
       */
     entitas_2.Entity.prototype.replaceLayer = function (ordinal) {
-        var previousComponent = this.hasLayer ? this.layer : null;
-        var component = entitas_2.Entity._layerComponentPool.size() > 0 ? entitas_2.Entity._layerComponentPool.removeLast() : new LayerComponent();
+        let previousComponent = this.hasLayer ? this.layer : null;
+        let component = entitas_2.Entity._layerComponentPool.size() > 0 ? entitas_2.Entity._layerComponentPool.removeLast() : new LayerComponent();
         component.ordinal = ordinal;
         this.replaceComponent(CoreComponentIds.Layer, component);
         if (previousComponent != null) {
@@ -3848,7 +3651,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_2.Entity.prototype.removeLayer = function () {
-        var component = this.layer;
+        let component = this.layer;
         this.removeComponent(CoreComponentIds.Layer);
         entitas_2.Entity._layerComponentPool.add(component);
         return this;
@@ -4120,7 +3923,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
         if (this.hasScore) {
             throw new entitas_exceptions_1.SingleEntityException(entitas_3.Matcher.Score);
         }
-        var entity = this.createEntity('Score');
+        let entity = this.createEntity('Score');
         entity.addScore(value);
         return entity;
     };
@@ -4129,7 +3932,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_1.Pool.prototype.replaceScore = function (value) {
-        var entity = this.scoreEntity;
+        let entity = this.scoreEntity;
         if (entity == null) {
             entity = this.setScore(value);
         }
@@ -4171,7 +3974,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
         if (this.hasMouse) {
             throw new entitas_exceptions_1.SingleEntityException(entitas_3.Matcher.Mouse);
         }
-        var entity = this.createEntity('Mouse');
+        let entity = this.createEntity('Mouse');
         entity.addMouse(value);
         return entity;
     };
@@ -4180,7 +3983,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
      * @returns {entitas.Entity}
      */
     entitas_1.Pool.prototype.replaceMouse = function (value) {
-        var entity = this.mouseEntity;
+        let entity = this.mouseEntity;
         if (entity == null) {
             entity = this.setMouse(value);
         }
@@ -4208,7 +4011,7 @@ define("components", ["require", "exports", "entitas", "entitas", "entitas", "en
             return this.firingEntity != null;
         },
         set: function (value) {
-            var entity = this.firingEntity;
+            let entity = this.firingEntity;
             if (value != (entity != null)) {
                 if (value) {
                     this.createEntity('Firing').isFiring = true;
@@ -4243,7 +4046,7 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
         Effect[Effect["ASPLODE"] = 1] = "ASPLODE";
         Effect[Effect["SMALLASPLODE"] = 2] = "SMALLASPLODE";
     })(Effect = exports.Effect || (exports.Effect = {}));
-    var Tau = Math.PI * 2;
+    const Tau = Math.PI * 2;
     /**
      * Create the player
      */
@@ -4281,11 +4084,11 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
      * @param y
      */
     entitas_4.Pool.prototype.createParticle = function (x, y) {
-        var radians = Math.random() * Tau;
-        var magnitude = Math.random() * 200;
-        var velocityX = magnitude * Math.cos(radians);
-        var velocityY = magnitude * Math.sin(radians);
-        var scale = Math.random();
+        const radians = Math.random() * Tau;
+        const magnitude = Math.random() * 200;
+        const velocityX = magnitude * Math.cos(radians);
+        const velocityY = magnitude * Math.sin(radians);
+        const scale = Math.random();
         this.createEntity('Particle')
             .addExpires(1)
             .addPosition(~~x, ~~y)
@@ -4303,7 +4106,7 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
      */
     entitas_4.Pool.prototype.createSmallExplosion = function (x, y) {
         //        tint: {r:0xd2, g:0xfa, b:0xd2, a:0xfa},
-        var scale = .2;
+        const scale = .2;
         this.createEntity('SmallExp')
             .addExpires(0.5)
             .addScaleAnimation(scale / 100, scale, -3, false, true)
@@ -4321,7 +4124,7 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
      * @param y
      */
     entitas_4.Pool.prototype.createBigExplosion = function (x, y) {
-        var scale = .5;
+        const scale = .5;
         this.createEntity('BigExp')
             .addExpires(0.5)
             .addScaleAnimation(scale / 100, scale, -3, false, true)
@@ -4337,8 +4140,8 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
      *
      */
     entitas_4.Pool.prototype.createEnemy1 = function () {
-        var x = Math.random() * (Sdx_1.Sdx.app.width - 40) + 20;
-        var y = Sdx_1.Sdx.app.height / 2 - 200;
+        const x = Math.random() * (Sdx_1.Sdx.app.width - 40) + 20;
+        const y = Sdx_1.Sdx.app.height / 2 - 200;
         this.createEntity("Enemy1")
             .addBounds(20)
             .addPosition(~~x, ~~y)
@@ -4352,8 +4155,8 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
      * Create enemy ship #2
      */
     entitas_4.Pool.prototype.createEnemy2 = function () {
-        var x = Math.random() * (Sdx_1.Sdx.app.width - 80) + 40;
-        var y = Sdx_1.Sdx.app.height / 2 - 100;
+        const x = Math.random() * (Sdx_1.Sdx.app.width - 80) + 40;
+        const y = Sdx_1.Sdx.app.height / 2 - 100;
         this.createEntity("Enemy2")
             .addBounds(40)
             .addPosition(~~x, ~~y)
@@ -4367,8 +4170,8 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
      * Create enemy ship #3
      */
     entitas_4.Pool.prototype.createEnemy3 = function () {
-        var x = Math.random() * (Sdx_1.Sdx.app.width - 140) + 70;
-        var y = Sdx_1.Sdx.app.height / 2 - 50;
+        const x = Math.random() * (Sdx_1.Sdx.app.width - 140) + 70;
+        const y = Sdx_1.Sdx.app.height / 2 - 50;
         this.createEntity("Enemy3")
             .addBounds(70)
             .addPosition(~~x, ~~y)
@@ -4382,42 +4185,38 @@ define("extensions", ["require", "exports", "Sdx", "entitas"], function (require
 define("systems/MovementSystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_2, entitas_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var MovementSystem = (function () {
-        function MovementSystem() {
-        }
-        MovementSystem.prototype.execute = function () {
-            var entities = this.group.getEntities();
-            for (var _i = 0, entities_1 = entities; _i < entities_1.length; _i++) {
-                var e = entities_1[_i];
-                var delta = Sdx_2.Sdx.app.deltaTime;
+    class MovementSystem {
+        execute() {
+            let entities = this.group.getEntities();
+            for (let e of entities) {
+                let delta = Sdx_2.Sdx.app.deltaTime;
                 e.position.x += (e.velocity.x * delta);
                 e.position.y -= (e.velocity.y * delta);
-                var sprite = e.sprite.object;
+                let sprite = e.sprite.object;
                 sprite.x = e.position.x;
                 sprite.y = e.position.y;
             }
-        };
-        MovementSystem.prototype.setPool = function (pool) {
+        }
+        setPool(pool) {
             this.pool = pool;
             this.group = pool.getGroup(entitas_5.Matcher.allOf(entitas_5.Matcher.Position, entitas_5.Matcher.Velocity));
-        };
-        return MovementSystem;
-    }());
+        }
+    }
     exports.MovementSystem = MovementSystem;
 });
 define("systems/PlayerInputSystem", ["require", "exports", "Sdx", "Sdx", "entitas"], function (require, exports, Sdx_3, Sdx_4, entitas_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var PlayerInputSystem = (function () {
-        function PlayerInputSystem() {
+    class PlayerInputSystem {
+        constructor() {
             this.timeToFire = 0;
         }
-        PlayerInputSystem.prototype.execute = function () {
-            var entities = this.group.getEntities();
+        execute() {
+            let entities = this.group.getEntities();
             if (entities.length === 0)
                 return;
-            var e = entities[0];
-            var position = e.position;
+            let e = entities[0];
+            let position = e.position;
             position.x = Sdx_3.Sdx.app.mouseX;
             position.y = Sdx_3.Sdx.app.mouseY;
             if (Sdx_3.Sdx.app.mouseDown || Sdx_3.Sdx.app.getKey(Sdx_4.Input.Keys.z)) {
@@ -4433,34 +4232,30 @@ define("systems/PlayerInputSystem", ["require", "exports", "Sdx", "Sdx", "entita
                     this.timeToFire = 0;
                 }
             }
-        };
-        PlayerInputSystem.prototype.initialize = function () {
+        }
+        initialize() {
             this.pool.createPlayer();
-        };
-        PlayerInputSystem.prototype.setPool = function (pool) {
+        }
+        setPool(pool) {
             this.pool = pool;
             this.group = pool.getGroup(entitas_6.Matcher.allOf(entitas_6.Matcher.Player));
-        };
-        return PlayerInputSystem;
-    }());
+        }
+    }
     PlayerInputSystem.FireRate = .1;
     exports.PlayerInputSystem = PlayerInputSystem;
 });
 define("systems/SoundEffectSystem", ["require", "exports", "entitas", "extensions", "Sdx"], function (require, exports, entitas_7, extensions_1, sdx) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var SoundEffectSystem = (function () {
-        function SoundEffectSystem() {
-        }
-        SoundEffectSystem.prototype.setPool = function (pool) {
+    class SoundEffectSystem {
+        setPool(pool) {
             this.pool = pool;
             this.group = pool.getGroup(entitas_7.Matcher.allOf(entitas_7.Matcher.SoundEffect));
-        };
-        SoundEffectSystem.prototype.execute = function () {
-            var entities = this.group.getEntities();
-            for (var _i = 0, entities_2 = entities; _i < entities_2.length; _i++) {
-                var e = entities_2[_i];
-                var soundEffect = e.soundEffect;
+        }
+        execute() {
+            let entities = this.group.getEntities();
+            for (let e of entities) {
+                let soundEffect = e.soundEffect;
                 switch (soundEffect.effect) {
                     case extensions_1.Effect.PEW:
                         this.pew.play(0);
@@ -4474,150 +4269,138 @@ define("systems/SoundEffectSystem", ["require", "exports", "entitas", "extension
                 }
                 e.removeSoundEffect();
             }
-        };
-        SoundEffectSystem.prototype.initialize = function () {
+        }
+        initialize() {
             this.pew = sdx.createSound("sounds/pew.wav");
             this.asplode = sdx.createSound("sounds/asplode.wav");
             this.smallasplode = sdx.createSound("sounds/smallasplode.wav");
-        };
-        return SoundEffectSystem;
-    }());
+        }
+    }
     exports.SoundEffectSystem = SoundEffectSystem;
 });
 define("systems/CollisionSystem", ["require", "exports", "entitas"], function (require, exports, entitas_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var CollisionSystem = (function () {
-        function CollisionSystem() {
-        }
-        CollisionSystem.prototype.setPool = function (pool) {
+    class CollisionSystem {
+        setPool(pool) {
             this.pool = pool;
-        };
+        }
         /**
          * Check for Collision
          */
-        CollisionSystem.prototype.execute = function () {
-            var collisionPairs = this.collisionPairs;
-            for (var _i = 0, collisionPairs_1 = collisionPairs; _i < collisionPairs_1.length; _i++) {
-                var pair = collisionPairs_1[_i];
+        execute() {
+            let collisionPairs = this.collisionPairs;
+            for (let pair of collisionPairs)
                 pair.checkForCollisions();
-            }
-        };
+        }
         /**
          * Create collision handlers
          */
-        CollisionSystem.prototype.initialize = function () {
-            var _this = this;
+        initialize() {
             this.pool.setScore(0);
             this.bullets = this.pool.getGroup(entitas_8.Matcher.Bullet);
             this.enemies = this.pool.getGroup(entitas_8.Matcher.Enemy);
             /** Check for bullets hitting enemy ship */
             this.collisionPairs = [];
             this.collisionPairs.push(new CollisionPair(this, this.bullets, this.enemies, {
-                handleCollision: function (bullet, ship) {
-                    var bp = bullet.position;
-                    var health = ship.health;
-                    var position = ship.position;
-                    var x = bp.x;
-                    var y = bp.y;
-                    _this.pool.createSmallExplosion(x, y);
-                    var i = 3;
+                handleCollision: (bullet, ship) => {
+                    let bp = bullet.position;
+                    let health = ship.health;
+                    let position = ship.position;
+                    let x = bp.x;
+                    let y = bp.y;
+                    this.pool.createSmallExplosion(x, y);
+                    let i = 3;
                     while (--i > 0)
-                        _this.pool.createParticle(x, y);
+                        this.pool.createParticle(x, y);
                     bullet.setDestroy(true);
                     health.health -= 2;
                     if (health.health < 0) {
-                        var score = (_this.pool.score);
-                        _this.pool.replaceScore(score.value + ship.health.maximumHealth);
+                        let score = (this.pool.score);
+                        this.pool.replaceScore(score.value + ship.health.maximumHealth);
                         ship.setDestroy(true);
-                        _this.pool.createBigExplosion(position.x, position.y);
+                        this.pool.createBigExplosion(position.x, position.y);
                     }
                 }
             }));
-        };
-        return CollisionSystem;
-    }());
+        }
+    }
     exports.CollisionSystem = CollisionSystem;
     /**
      *
      */
-    var CollisionPair = (function () {
-        function CollisionPair(cs, group1, group2, handler) {
+    class CollisionPair {
+        constructor(cs, group1, group2, handler) {
             this.groupEntitiesA = group1;
             this.groupEntitiesB = group2;
             this.handler = handler;
             this.cs = cs;
         }
-        CollisionPair.prototype.checkForCollisions = function () {
-            var handler = this.handler;
-            var groupEntitiesA = this.groupEntitiesA.getEntities();
-            var groupEntitiesB = this.groupEntitiesB.getEntities();
-            var sizeA = groupEntitiesA.length;
-            var sizeB = groupEntitiesB.length;
-            for (var a = 0; sizeA > a; a++) {
-                var entityA = groupEntitiesA[a];
-                for (var b = 0; sizeB > b; b++) {
-                    var entityB = groupEntitiesB[b];
+        checkForCollisions() {
+            let handler = this.handler;
+            let groupEntitiesA = this.groupEntitiesA.getEntities();
+            let groupEntitiesB = this.groupEntitiesB.getEntities();
+            let sizeA = groupEntitiesA.length;
+            let sizeB = groupEntitiesB.length;
+            for (let a = 0; sizeA > a; a++) {
+                let entityA = groupEntitiesA[a];
+                for (let b = 0; sizeB > b; b++) {
+                    let entityB = groupEntitiesB[b];
                     if (this.collisionExists(entityA, entityB)) {
                         handler.handleCollision(entityA, entityB);
                     }
                 }
             }
-        };
-        CollisionPair.prototype.collisionExists = function (e1, e2) {
+        }
+        collisionExists(e1, e2) {
             if (e1 === null || e2 === null)
                 return false;
-            var p1 = e1.position;
-            var p2 = e2.position;
-            var b1 = e1.bounds;
-            var b2 = e2.bounds;
-            var a = p1.x - p2.x;
-            var b = p1.y - p2.y;
+            let p1 = e1.position;
+            let p2 = e2.position;
+            let b1 = e1.bounds;
+            let b2 = e2.bounds;
+            let a = p1.x - p2.x;
+            let b = p1.y - p2.y;
             return Math.sqrt(a * a + b * b) - (b1.radius) < (b2.radius);
-        };
-        return CollisionPair;
-    }());
+        }
+    }
 });
 define("systems/ExpiringSystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_5, entitas_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var ExpiringSystem = (function () {
-        function ExpiringSystem() {
-        }
-        ExpiringSystem.prototype.execute = function () {
-            var pool = this.pool;
-            var entities = this.group.getEntities();
-            for (var _i = 0, entities_3 = entities; _i < entities_3.length; _i++) {
-                var e = entities_3[_i];
+    class ExpiringSystem {
+        execute() {
+            let pool = this.pool;
+            let entities = this.group.getEntities();
+            for (let e of entities) {
                 if ((e.expires.delay -= Sdx_5.Sdx.app.deltaTime) <= 0) {
                     e.isDestroy = true;
                 }
             }
-        };
-        ExpiringSystem.prototype.setPool = function (pool) {
+        }
+        setPool(pool) {
             this.pool = pool;
             this.group = pool.getGroup(entitas_9.Matcher.allOf(entitas_9.Matcher.Expires));
-        };
-        return ExpiringSystem;
-    }());
+        }
+    }
     exports.ExpiringSystem = ExpiringSystem;
 });
 define("systems/EntitySpawningTimerSystem", ["require", "exports", "Sdx"], function (require, exports, Sdx_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var T1 = 2; //1 //2
-    var T2 = 6; //5 //6
-    var T3 = 12; //7 //12
-    var EntitySpawningTimerSystem = (function () {
-        function EntitySpawningTimerSystem() {
+    const T1 = 2; //1 //2
+    const T2 = 6; //5 //6
+    const T3 = 12; //7 //12
+    class EntitySpawningTimerSystem {
+        constructor() {
             this.enemyT1 = 0; //T1
             this.enemyT2 = T2 / 2;
             this.enemyT3 = T3 / 2;
         }
-        EntitySpawningTimerSystem.prototype.execute = function () {
-            var deltaTime = Sdx_6.Sdx.app.deltaTime;
+        execute() {
+            let deltaTime = Sdx_6.Sdx.app.deltaTime;
             function spawn(pool, t, enemy) {
-                var d1 = t - deltaTime;
+                const d1 = t - deltaTime;
                 if (d1 < 0) {
                     switch (enemy) {
                         case 1:
@@ -4637,30 +4420,26 @@ define("systems/EntitySpawningTimerSystem", ["require", "exports", "Sdx"], funct
             this.enemyT1 = spawn(this.pool, this.enemyT1, 1);
             this.enemyT2 = spawn(this.pool, this.enemyT2, 2);
             this.enemyT3 = spawn(this.pool, this.enemyT3, 3);
-        };
-        EntitySpawningTimerSystem.prototype.initialize = function () {
-        };
-        EntitySpawningTimerSystem.prototype.setPool = function (pool) {
+        }
+        initialize() {
+        }
+        setPool(pool) {
             this.pool = pool;
-        };
-        return EntitySpawningTimerSystem;
-    }());
+        }
+    }
     exports.EntitySpawningTimerSystem = EntitySpawningTimerSystem;
 });
 define("systems/ScaleAnimationSystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_7, entitas_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var ScaleAnimationSystem = (function () {
-        function ScaleAnimationSystem() {
-        }
-        ScaleAnimationSystem.prototype.execute = function () {
-            var delta = Sdx_7.Sdx.app.deltaTime;
-            var entities = this.group.getEntities();
-            for (var _i = 0, entities_4 = entities; _i < entities_4.length; _i++) {
-                var e = entities_4[_i];
-                var scaleAnimation = e.scaleAnimation;
+    class ScaleAnimationSystem {
+        execute() {
+            let delta = Sdx_7.Sdx.app.deltaTime;
+            let entities = this.group.getEntities();
+            for (let e of entities) {
+                let scaleAnimation = e.scaleAnimation;
                 if (scaleAnimation.active) {
-                    var scale = e.scale;
+                    let scale = e.scale;
                     scale.x += scaleAnimation.speed * delta;
                     scale.y = scale.x;
                     if (scale.x > scaleAnimation.max) {
@@ -4673,51 +4452,45 @@ define("systems/ScaleAnimationSystem", ["require", "exports", "Sdx", "entitas"],
                         scale.y = scale.x;
                         scaleAnimation.active = false;
                     }
-                    var sprite = (e.sprite.object);
+                    let sprite = (e.sprite.object);
                     sprite.setScale(scale.x, scale.y);
                 }
             }
-        };
-        ScaleAnimationSystem.prototype.setPool = function (pool) {
+        }
+        setPool(pool) {
             this.pool = pool;
             this.group = pool.getGroup(entitas_10.Matcher.allOf(entitas_10.Matcher.ScaleAnimation));
-        };
-        return ScaleAnimationSystem;
-    }());
+        }
+    }
     exports.ScaleAnimationSystem = ScaleAnimationSystem;
 });
 define("systems/RemoveOffscreenShipsSystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_8, entitas_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var RemoveOffscreenShipsSystem = (function () {
-        function RemoveOffscreenShipsSystem() {
-        }
-        RemoveOffscreenShipsSystem.prototype.execute = function () {
-            var height = Sdx_8.Sdx.app.height;
-            var pool = this.pool;
-            var entities = this.group.getEntities();
-            for (var _i = 0, entities_5 = entities; _i < entities_5.length; _i++) {
-                var e = entities_5[_i];
+    class RemoveOffscreenShipsSystem {
+        execute() {
+            let height = Sdx_8.Sdx.app.height;
+            let pool = this.pool;
+            let entities = this.group.getEntities();
+            for (let e of entities) {
                 if (e.position.y > height - e.bounds.radius) {
                     e.isDestroy = true;
                     Sdx_8.Sdx.app.removeSprite(e.sprite.object);
                 }
             }
-        };
-        RemoveOffscreenShipsSystem.prototype.setPool = function (pool) {
+        }
+        setPool(pool) {
             this.pool = pool;
             this.group = pool.getGroup(entitas_11.Matcher.allOf(entitas_11.Matcher.Velocity, entitas_11.Matcher.Position, entitas_11.Matcher.Health, entitas_11.Matcher.Bounds));
-        };
-        return RemoveOffscreenShipsSystem;
-    }());
+        }
+    }
     exports.RemoveOffscreenShipsSystem = RemoveOffscreenShipsSystem;
 });
 define("systems/AddViewSystem", ["require", "exports", "Sdx", "entitas", "Sdx"], function (require, exports, Sdx_9, entitas_12, sdx) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var AddViewSystem = (function () {
-        function AddViewSystem() {
-            var _this = this;
+    class AddViewSystem {
+        constructor() {
             /**
              * OnEntityAdded - Resource component.
              *
@@ -4728,13 +4501,13 @@ define("systems/AddViewSystem", ["require", "exports", "Sdx", "entitas", "Sdx"],
              * @param index
              * @param component
              */
-            this.onEntityAdded = function (group, e, index, component) {
-                var sprite = _this.atlas.createSprite(e.resource.name, -1);
-                var position = e.position;
+            this.onEntityAdded = (group, e, index, component) => {
+                let sprite = this.atlas.createSprite(e.resource.name, -1);
+                let position = e.position;
                 sprite.x = position.x;
                 sprite.y = position.y;
                 if (e.hasScale) {
-                    var scale = e.scale;
+                    let scale = e.scale;
                     sprite.setScale(scale.x, scale.y);
                 }
                 sprite.layer = e.layer.ordinal;
@@ -4754,44 +4527,39 @@ define("systems/AddViewSystem", ["require", "exports", "Sdx", "entitas", "Sdx"],
          *
          * @param pool
          */
-        AddViewSystem.prototype.setPool = function (pool) {
+        setPool(pool) {
             this.pool = pool;
             pool.getGroup(entitas_12.Matcher.Resource).onEntityAdded.add(this.onEntityAdded);
-        };
-        return AddViewSystem;
-    }());
+        }
+    }
     exports.AddViewSystem = AddViewSystem;
 });
 define("systems/DestroySystem", ["require", "exports", "Sdx", "entitas"], function (require, exports, Sdx_10, entitas_13) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var DestroySystem = (function () {
-        function DestroySystem() {
-        }
-        DestroySystem.prototype.execute = function () {
-            var entities = this.group.getEntities();
-            for (var _i = 0, entities_6 = entities; _i < entities_6.length; _i++) {
-                var e = entities_6[_i];
+    class DestroySystem {
+        execute() {
+            let entities = this.group.getEntities();
+            for (let e of entities) {
                 Sdx_10.Sdx.app.removeSprite(e.sprite.object);
                 this.pool.destroyEntity(e);
             }
-        };
-        DestroySystem.prototype.setPool = function (pool) {
+        }
+        setPool(pool) {
             this.pool = pool;
             this.group = pool.getGroup(entitas_13.Matcher.allOf(entitas_13.Matcher.Destroy));
-        };
-        return DestroySystem;
-    }());
+        }
+    }
     exports.DestroySystem = DestroySystem;
 });
-define("shmupwarz", ["require", "exports", "Sdx", "entitas", "components", "systems/MovementSystem", "systems/PlayerInputSystem", "systems/SoundEffectSystem", "systems/CollisionSystem", "systems/ExpiringSystem", "systems/EntitySpawningTimerSystem", "systems/ScaleAnimationSystem", "systems/RemoveOffscreenShipsSystem", "systems/AddViewSystem", "systems/DestroySystem"], function (require, exports, Sdx_11, entitas_14, components_1, MovementSystem_1, PlayerInputSystem_1, SoundEffectSystem_1, CollisionSystem_1, ExpiringSystem_1, EntitySpawningTimerSystem_1, ScaleAnimationSystem_1, RemoveOffscreenShipsSystem_1, AddViewSystem_1, DestroySystem_1) {
+define("shmupwarz", ["require", "exports", "Sdx", "entitas", "components", "systems/MovementSystem", "systems/PlayerInputSystem", "systems/SoundEffectSystem", "systems/CollisionSystem", "systems/ExpiringSystem", "systems/EntitySpawningTimerSystem", "systems/ScaleAnimationSystem", "systems/RemoveOffscreenShipsSystem", "systems/AddViewSystem", "systems/DestroySystem", "Sdx"], function (require, exports, Sdx_11, entitas_14, components_1, MovementSystem_1, PlayerInputSystem_1, SoundEffectSystem_1, CollisionSystem_1, ExpiringSystem_1, EntitySpawningTimerSystem_1, ScaleAnimationSystem_1, RemoveOffscreenShipsSystem_1, AddViewSystem_1, DestroySystem_1, sdx) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var example;
     (function (example) {
         function main() {
-            var game = Sdx_11.createGame("ShmupWarz", 640, 720, DATADIR);
-            var shmupwarz = new Shmupwarz();
+            const game = sdx.createGame("ShmupWarz", 640, 720, DATADIR);
+            const shmupwarz = new Shmupwarz();
             shmupwarz.start();
             game.profile = true;
             game.start();
@@ -4805,14 +4573,12 @@ define("shmupwarz", ["require", "exports", "Sdx", "entitas", "components", "syst
                 }
             }
         }
-        var Shmupwarz = (function () {
-            function Shmupwarz() {
-            }
-            Shmupwarz.prototype.start = function () {
+        class Shmupwarz {
+            start() {
                 this.systems = this.createSystems(components_1.Pools.pool);
                 this.systems.initialize();
-            };
-            Shmupwarz.prototype.createSystems = function (pool) {
+            }
+            createSystems(pool) {
                 return new entitas_14.Systems()
                     .add(pool.createSystem(MovementSystem_1.MovementSystem))
                     .add(pool.createSystem(PlayerInputSystem_1.PlayerInputSystem))
@@ -4824,12 +4590,11 @@ define("shmupwarz", ["require", "exports", "Sdx", "entitas", "components", "syst
                     .add(pool.createSystem(RemoveOffscreenShipsSystem_1.RemoveOffscreenShipsSystem))
                     .add(pool.createSystem(AddViewSystem_1.AddViewSystem))
                     .add(pool.createSystem(DestroySystem_1.DestroySystem));
-            };
-            Shmupwarz.prototype.update = function (delta) {
+            }
+            update(delta) {
                 this.systems.execute();
-            };
-            return Shmupwarz;
-        }());
+            }
+        }
         example.Shmupwarz = Shmupwarz;
         main();
     })(example || (example = {}));

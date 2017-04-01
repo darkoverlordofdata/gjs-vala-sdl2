@@ -13,12 +13,15 @@ import {AddViewSystem} from 'systems/AddViewSystem'
 // import {HealthRenderSystem} from 'systems/HealthRenderSystem'
 // import {HudRenderSystem} from 'systems/HudRenderSystem'
 import {DestroySystem} from 'systems/DestroySystem'
+//0.001451
+//0.002207
+import * as sdx from 'Sdx'
 
 module example {
 
   function main() {
 
-      const game = createGame("ShmupWarz", 640, 720, DATADIR) 
+      const game = sdx.createGame("ShmupWarz", 640, 720, DATADIR) 
       const shmupwarz = new Shmupwarz()
 
       shmupwarz.start()

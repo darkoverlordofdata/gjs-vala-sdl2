@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/darkoverlordofdata/gjs-vala-sdl2#readme",
   "dependencies": {
+    "coffee-script": "^1.12.4",
     "gir2dts": "^0.1.3",
     "xml2js": "^0.4.17"
   },
